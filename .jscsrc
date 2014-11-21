@@ -1,0 +1,81 @@
+// Note: You can use comments!
+
+{
+  "maxErrors": 5,
+  "esnext": true,
+
+  "requireCurlyBraces": [ "for" ],
+  // "requireSpaceBeforeKeywords": true,
+  "requireSpaceAfterKeywords": true,
+
+  "requireSpaceBeforeBlockStatements": true,
+  "requireParenthesesAroundIIFE": true,
+  "requireSpacesInConditionalExpression": true,
+  "requireSpacesInFunction": {
+    "beforeOpeningRoundBrace": true,
+    "beforeOpeningCurlyBrace": true
+  },
+  "disallowSpacesInCallExpression": true,
+
+  "requireBlocksOnNewline": 1,
+  "disallowPaddingNewlinesInBlocks": true,
+  // "requirePaddingNewlinesBeforeKeywords": true,
+  "disallowEmptyBlocks": true,
+
+  "requireSpacesInsideObjectBrackets": "all",
+  "disallowSpacesInsideArrayBrackets": true,
+  "disallowSpacesInsideParentheses": true,
+
+  "disallowSpaceAfterObjectKeys": true,
+  "requireSpaceBeforeObjectValues": true,
+
+  "requireCommaBeforeLineBreak": true,
+  "requireOperatorBeforeLineBreak": true,
+
+  "disallowSpaceAfterPrefixUnaryOperators": true,
+  "disallowSpaceBeforePostfixUnaryOperators": true,
+  "requireSpaceBeforeBinaryOperators": true,
+  "requireSpaceAfterBinaryOperators": true,
+
+  // will use if they ever allow you to use snake case for non-function variables
+  // "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
+  "requireCapitalizedConstructors": true,
+
+  "disallowKeywords": ["with", "class"],
+
+  "disallowMultipleLineStrings": true,
+  "disallowMultipleLineBreaks": true,
+
+  "disallowMixedSpacesAndTabs": true,
+  "disallowTrailingWhitespace": true,
+  "disallowTrailingComma": true,
+
+  // doesn't play friendly with blockless elses
+  // "disallowKeywordsOnNewLine": ["else"],
+
+  /*"maximumLineLength": {
+    "value": 80,
+    "tabSize": 2,
+    "allowUrlComments": true,
+    "allowRegex": true
+  },*/
+
+  "disallowYodaConditions": true,
+
+  "requireSpaceAfterLineComment": true,
+  //"requireCapitalizedComments": true,
+
+  "disallowNewlineBeforeBlockStatements": true,
+
+  "validateQuoteMarks": {
+    "mark": "'",
+    "escape": true
+  },
+
+  "validateIndentation": 2,
+
+  "requireLineFeedAtFileEnd": true,
+  "validateParameterSeparator": ", ",
+
+  "safeContextKeyword": ["that"]
+}
