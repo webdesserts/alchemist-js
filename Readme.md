@@ -35,10 +35,10 @@ To get up and running quickly in node, install `alchemist-js` with npm
 npm install alchemist-js
 ```
 
-You can use the [alchemist-common] plugin bundle
+You can use the [alchemist-common][] plugin bundle
 which comes included with alchemist by default.
 
-[alchemist-common](https://github.com/webdesserts/alchemist-common)
+[alchemist-common]: https://github.com/webdesserts/alchemist-common
 
 ```js
 var alchemist = require('alchemist-js').create()
@@ -72,7 +72,7 @@ handle **conversion paths**.
 So let's say you have an **RGB** value that you want to convert to this cool new
 [HuSL][] color space you've been hearing all about. What would that look like?
 
-[HuSL](http://www.boronine.com/husl/)
+[HuSL]: http://www.boronine.com/husl/
 
 *Maybe something like this?*
 ```
@@ -104,7 +104,7 @@ similar to this in almost every color library in use today. These hard-coded
 conversion paths prevent color libraries from becoming truly modular and force
 color spaces like HuSL to practically [implement their own color libraries][HuSL libraries].
 
-[HuSL libraries](https://github.com/boronine/husl/blob/aa2afb58ccb829c8f9f3c679b96c25bfacb4552b/husl.js#L386-L400)
+[HuSL libraries]: https://github.com/boronine/husl/blob/aa2afb58ccb829c8f9f3c679b96c25bfacb4552b/husl.js#L386-L400
 
 ### Where Alchemist.js Comes In
 
