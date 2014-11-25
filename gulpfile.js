@@ -13,6 +13,8 @@ gulp.task('build:min', ['build:web'], function () {
   return gulp.src('dist/alchemist.js')
   .pipe(g.uglify())
   .pipe(g.rename({ suffix: '.min' }))
+  .pipe(g.size({ showFiles: true }))
+  .pipe(g.size({ showFiles: true, gzip: true }))
   .pipe(gulp.dest('dist'))
 })
 

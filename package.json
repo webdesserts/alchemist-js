@@ -7,7 +7,9 @@
     "test": "mocha"
   },
   "keywords": [
-    "color", "colour", "color-spaces"
+    "color",
+    "colour",
+    "color-spaces"
   ],
   "author": "Michael Mullins",
   "license": "MIT",
@@ -24,7 +26,8 @@
     "run-sequence": "^1.0.1"
   },
   "dependencies": {
-    "alchemist-common": "^0.1.1"
+    "alchemist-common": "^0.1.1",
+    "gulp-size": "^1.1.0"
   },
   "directories": {
     "test": "test"
