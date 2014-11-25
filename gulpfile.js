@@ -9,21 +9,31 @@ es6_whitelist = ['modules']
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
 
-gulp.task('build', function (cb) {
-  return gulp.src('alchemist.js')
-  .pipe(gulp.dest('dist/'))
+gulp.task('build:min', ['build:web'], function () {
+  return gulp.src('dist/alchemist.js')
+  .pipe(g.uglify())
+  .pipe(g.rename({ suffix: '.min' }))
+  .pipe(gulp.dest('dist'))
 })
 
-/*gulp.task('test:compile', ['clean'], function () {
-  return gulp.src('test/spec/*.spec.js')
-    .pipe(to5({ modules: 'amd', blacklist: es6_blacklist }))
-    .on('error', warn)
-    .pipe(gulp.dest('.tmp/spec'))
-})*/
+gulp.task('build:web', function () {
+  return gulp.src('lib/alchemist.js')
+  .pipe(g.webpack({
+    output: {
+      filename: 'alchemist.js',
+      libraryTarget: 'umd',
+      library: 'Alchemist',
+      sourcePrefix: ''
+    }
+  }))
+  .pipe(gulp.dest('dist'))
+})
+
+gulp.task('build', ['build:web', 'build:min'])
 
 gulp.task('test:run', function () {
-  return gulp.src('test/index.html')
-    .pipe(g.mochaPhantomjs({ reporter: 'spec' }))
+  return gulp.src('test/*.js')
+    .pipe(g.mocha({ reporter: 'spec' }))
     .on('error', warn)
 })
 
@@ -32,19 +42,18 @@ gulp.task('test', function (cb) {
 })
 
 gulp.task('lint', function () {
-  return gulp.src(['gulpfile.js', 'test/**/*.js', 'alchemist.js'])
+  return gulp.src(['gulpfile.js', 'test/*.js', 'alchemist.js'])
     .pipe(g.jscs())
     .on('error', warn)
 })
 
 gulp.task('watch:lint', ['lint'], function () {
-  gulp.watch(['gulpfile.js', '.jscsrc', 'test/**/*.js', 'alchemist.js'], ['lint'])
+  gulp.watch(['gulpfile.js', '.jscsrc', 'test/*.js', 'alchemist.js'], ['lint'])
 })
 
 gulp.task('default', ['test'], function () {
-  gulp.watch('test/assets/*.js', ['test'])
-  gulp.watch('test/spec/*.spec.js', ['test'])
-  gulp.watch('alchemist.js', ['test', 'lint'])
+  gulp.watch('test/*.js', ['test'])
+  gulp.watch('lib/*.js', ['test', 'lint'])
 })
 
 function warn (err) {
