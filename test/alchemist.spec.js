@@ -52,6 +52,26 @@ describe('Alchemist', function () {
       expect(alchemist.use.bind(null, plugin)).to.throw(Error)
     })
   })
+
+  describe('color methods', function () {
+    var alchemist, rgb;
+
+    before(function () {
+      alchemist = Alchemist.create()
+      rgb = { name: 'rgb', to: {} }
+      alchemist.use(rgb)
+    })
+
+    it('can take an array of values', function () {
+      expect(alchemist.rgb([255, 255, 255])).to.be.ok
+      expect(alchemist.rgb([255, 255, 255]).value).to.deep.eq([255, 255, 255])
+    })
+
+    it('can take the values as a list of arguments', function () {
+      expect(alchemist.rgb(255, 255, 255)).to.be.ok
+      expect(alchemist.rgb(255, 255, 255).value).to.deep.eq([255, 255, 255])
+    })
+  })
 })
 
 /**=======
@@ -59,30 +79,28 @@ describe('Alchemist', function () {
  =======**/
 
 describe('Color', function () {
-  describe('color()', function () {
-    var color, alchemist;
-    before(function () {
-      color = new Alchemist.Color('rgb', [255, 255, 255])
-      alchemist = Alchemist.create()
+  describe('a value', function () {
+    it('can be an array of values', function () {
+      var value = [255, 255, 255]
+      var color = new Alchemist.Color('rgb', value)
+      expect(color.value).to.deep.eq(value)
     })
-    it('should have a reference white', function () {
-      expect(color.white).to.exist()
-    })
-
-    it('should have a color space', function () {
-      expect(color.color_space).to.equal('rgb')
-    })
-
-    it('should have values', function () {
-      expect(color.value).to.deep.equal([255, 255, 255])
+    it('a single object such as a string or number', function () {
+      var value = '#ff0000'
+      var color = new Alchemist.Color('rgb', value)
+      expect(color.value).to.deep.eq(value)
     })
   })
 
-  describe('prototype.color()', function () {
-    var alchemist, color;
+  describe('Color.prototype', function () {
+    var color;
+
     before(function () {
-      alchemist = Alchemist.create()
-      color = new alchemist.Color('rgb', [255, 255, 255])
+      color = new Alchemist.Color('rgb', [255, 255, 255])
+    })
+
+    it('should have a reference white', function () {
+      expect(color.white).to.exist()
     })
 
     it('should have a color space', function () {
