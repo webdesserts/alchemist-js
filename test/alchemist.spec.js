@@ -38,7 +38,7 @@ describe('Alchemist', function () {
 
     it('should allow a color space to teach another space how to convert to it')
 
-    it('should prefer a local "to" conversion over a foreign "from" conversion')
+    it('should prefer a local "from" conversion over a foreign "to" conversion')
 
     it('should store conversions to abstract spaces', function () {
       expect(alchemist.spaces.rgb.to).to.not.have.property('hsl')
