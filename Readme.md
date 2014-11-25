@@ -1,6 +1,6 @@
 Alchemist.js
 ============
-The pluggable color library.
+The extensible color library.
 
 ```js
 var alchemist = require('alchemist-js').create()
