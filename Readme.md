@@ -184,8 +184,12 @@ Nice! What happens when we try to convert from rgb to myrgb?
 ```js
 alchemist.rgb(255, 255, 255).myrgb() // Error! Alchemist does not know how to convert from rgb to myrgb
 ```
+Error?? Looks like we need to shout at the `alchemist-rgb` guys becuase they haven't implemented a conversion
+to **the best** color space in the world!
 
-Looks like we need to define another conversion.
+...or
+
+Again, we can define our own conversion.
 
 ```js
 alchemist.use({
