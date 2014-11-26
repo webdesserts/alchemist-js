@@ -6,14 +6,16 @@ var fs = require('fs')
 var package_config = require('./package.json')
 
 var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>\n'
-var large_header = '/**\n' +
-' * Alchemist.js\n' +
-' * v<%= version %>\n' +
-' * License: <%= license %>\n' +
-' *\n' +
-' * Author: <%= author %>\n' +
-' * Website: <%= homepage %>\n' +
-' */\n\n'
+var large_header = [
+'/**',
+' * Alchemist.js',
+' * v<%= version %>',
+' * License: <%= license %>',
+' *',
+' * Author: <%= author %>',
+' * Website: <%= homepage %>',
+' *',
+''].join('\n')
 
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
