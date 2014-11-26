@@ -6,6 +6,15 @@ var fs = require('fs')
 var package_config = require('./package.json')
 
 var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>\n'
+var large_header = '/**\n' +
+' * Alchemist.js\n' +
+' * v<%= version %>\n' +
+' * License: <%= license %>\n' +
+' *\n' +
+' * Author: <%= author %>\n' +
+' * Website: <%= homepage %>\n' +
+' */\n\n'
+
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
 
@@ -29,7 +38,7 @@ gulp.task('build:web', function () {
       sourcePrefix: ''
     }
   }))
-  .pipe(g.header(fs.readFileSync('header.txt', 'utf8'), package_config))
+  .pipe(g.header(large_header, package_config))
   .pipe(g.rename({ suffix: '-' + package_config.version }))
   .pipe(gulp.dest('dist'))
 })

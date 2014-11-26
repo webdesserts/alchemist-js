@@ -1,9 +1,0 @@
-/**
- * Alchemist.js
- * v<%= version %>
- * License: <%= license %>
- *
- * Author: <%= author %>
- * Website: <%= homepage %>
- */
-
