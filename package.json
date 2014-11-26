@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "alchemist-common": "^0.1.1",
+    "gulp-header": "^1.2.2",
     "gulp-size": "^1.1.0"
   },
   "directories": {

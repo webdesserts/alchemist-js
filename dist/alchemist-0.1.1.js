@@ -1,3 +1,12 @@
+/**
+ * Alchemist.js
+ * v0.1.1
+ * License: MIT
+ *
+ * Author: Michael Mullins
+ * Website: https://github.com/webdesserts/alchemist-js
+ */
+
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -54,13 +63,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-/*
- * Alchemist.js
- *
- * Author: Michael C. Mullins
- * Lisence: MIT
- *
- */
+
+var ColorSpaceStore = __webpack_require__(1)
+var ModifierStore = __webpack_require__(2)
+
+var helpers = __webpack_require__(3)
 
 /**=======
  * Color *
@@ -104,6 +111,10 @@ var Alchemist = function (options) {
   this.precision = options.precision || 4
 }
 
+// define any extra objects
+helpers.mixin(Alchemist.prototype, ColorSpaceStore)
+helpers.mixin(Alchemist.prototype, ModifierStore)
+
 /**
  * Convenience method for quickly creating an Alchemist instance during a require
  *
@@ -131,7 +142,7 @@ Alchemist.Color = Alchemist.prototype.Color = Color
  */
 
 Alchemist.prototype.use = function (plugin) {
-  if (isArray(plugin)) {
+  if (helpers.isArray(plugin)) {
     for (var i = 0; i < plugin.length; i++) {
       this.use(plugin[i])
     }
@@ -216,10 +227,10 @@ Alchemist.prototype.convert = function (color, dest) {
   converter = current_space.to[dest]
   // Test to see if the current space knows how to convert to dest
   if (typeof converter === 'function') {
-    if (isArray(color.value)) {
-      value = converter.apply(this, attemptClone(color.value).concat(color));
+    if (helpers.isArray(color.value)) {
+      value = converter.apply(this, helpers.attemptClone(color.value).concat(color));
     } else {
-      value = converter(attemptClone(color.value), color)
+      value = converter(helpers.attemptClone(color.value), color)
     }
     value = this.round(value)
     color.color_space = dest
@@ -250,7 +261,7 @@ Alchemist.prototype.convert = function (color, dest) {
  */
 
 Alchemist.prototype.round = function (value) {
-  if (isArray(value)) {
+  if (helpers.isArray(value)) {
     for (var i = 0; i < value.length; i++) {
       value[i] = this.roundIfNumber(value[i])
     }
@@ -273,6 +284,15 @@ Alchemist.prototype.roundIfNumber = function (value) {
   }
   return value
 }
+
+// export Alchemist!
+module.exports = Alchemist
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
 
 /**===================
  * Color Space Store *
@@ -536,6 +556,15 @@ ColorSpaceStore.findColorSpace = function (color_space) {
   return this.spaces[color_space] || null
 }
 
+
+module.exports = ColorSpaceStore
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+
 /**================
  * Modifier Store *
  ================**/
@@ -545,6 +574,14 @@ var ModifierStore = {}
 ModifierStore.defineModifier = function (modifier) {
   throw new Error('Modifiers are not yet implemented')
 }
+
+module.exports = ModifierStore
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
 
 /**=========
  * Helpers *
@@ -564,7 +601,7 @@ ModifierStore.defineModifier = function (modifier) {
  * (thanks addyosamani)
  */
 
-var mixin = function (receiving_obj, giving_obj) {
+exports.mixin = function (receiving_obj, giving_obj) {
   // allows you to only mix in a set set of methods
   if (arguments[2]) {
     for (var i = 2, len = arguments.length; i < len; i++) {
@@ -588,7 +625,7 @@ var mixin = function (receiving_obj, giving_obj) {
  * @param {object} original object to be cloned
  */
 
-var clone = function (original) {
+exports.clone = function (original) {
   var Con = original.constructor
 
   if (typeof original === 'string' || typeof original === 'number')
@@ -616,8 +653,8 @@ var clone = function (original) {
  * @param {object} orignal object to be cloned
  */
 
-var attemptClone = function (original) {
-  var cloned = clone(original);
+exports.attemptClone = function (original) {
+  var cloned = this.clone(original);
   return cloned || original
 }
 
@@ -628,16 +665,9 @@ var attemptClone = function (original) {
  * @param {object} object possibly an array?
  */
 
-var isArray = function isArray (object) {
+exports.isArray = function isArray (object) {
   return Array.isArray(object)
 }
-
-// define any extra objects
-mixin(Alchemist.prototype, ColorSpaceStore)
-mixin(Alchemist.prototype, ModifierStore)
-
-// export Alchemist!
-module.exports = Alchemist
 
 
 /***/ }

@@ -1,21 +1,22 @@
 var gulp = require('gulp')
-var to5 = require('gulp-6to5')
-var rjs = require('requirejs')
+var g = require('gulp-load-plugins')()
 var series = require('run-sequence')
 var del = require('del')
-var g = require('gulp-load-plugins')()
+var fs = require('fs')
+var package_config = require('./package.json')
 
-es6_whitelist = ['modules']
+var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>\n'
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
 
 gulp.task('build:min', ['build:web'], function () {
-  return gulp.src('dist/alchemist.js')
+  return gulp.src('dist/alchemist-*.js')
   .pipe(g.uglify())
+  .pipe(g.header(small_header, package_config))
   .pipe(g.rename({ suffix: '.min' }))
+  .pipe(gulp.dest('dist'))
   .pipe(g.size({ showFiles: true }))
   .pipe(g.size({ showFiles: true, gzip: true }))
-  .pipe(gulp.dest('dist'))
 })
 
 gulp.task('build:web', function () {
@@ -23,15 +24,19 @@ gulp.task('build:web', function () {
   .pipe(g.webpack({
     output: {
       filename: 'alchemist.js',
-      libraryTarget: 'umd',
       library: 'Alchemist',
+      libraryTarget: 'umd',
       sourcePrefix: ''
     }
   }))
+  .pipe(g.header(fs.readFileSync('header.txt', 'utf8'), package_config))
+  .pipe(g.rename({ suffix: '-' + package_config.version }))
   .pipe(gulp.dest('dist'))
 })
 
-gulp.task('build', ['build:web', 'build:min'])
+gulp.task('build', function () {
+  series('clean', 'build:web', 'build:min')
+})
 
 gulp.task('test:run', function () {
   return gulp.src('test/*.js')
