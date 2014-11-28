@@ -7,18 +7,18 @@ var package_config = require('./package.json')
 var fs = require('fs')
 var EOL = require('os').EOL
 
-var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>'+EOL
+var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>' + EOL
 var large_header = [
-'/**',
-' * Alchemist.js',
-' * v<%= version %>',
-' * License: <%= license %>',
-' *',
-' * Author: <%= author %>',
-' * Website: <%= homepage %>',
-' */',
-EOL].join(EOL)
-
+  '/**',
+  ' * Alchemist.js',
+  ' * v<%= version %>',
+  ' * License: <%= license %>',
+  ' *',
+  ' * Author: <%= author %>',
+  ' * Website: <%= homepage %>',
+  ' */',
+  EOL
+].join(EOL)
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
 
@@ -39,22 +39,20 @@ gulp.task('build:web', function () {
       filename: 'alchemist.js',
       library: 'Alchemist',
       libraryTarget: 'umd',
-      sourcePrefix: ''
-    }
-  }))
-  .pipe(g.header(large_header, package_config))
-  .pipe(g.rename({ suffix: '-' + package_config.version }))
-  .pipe(gulp.dest('dist'))
+      sourcePrefix: '' } }))
+      .pipe(g.header(large_header, package_config))
+      .pipe(g.rename({ suffix: '-' + package_config.version }))
+      .pipe(gulp.dest('dist'))
 })
 
-gulp.task('build', function () {
-  series('clean', 'build:web', 'build:min')
+gulp.task('build', function (cb) {
+  series('clean', 'build:web', 'build:min', cb)
 })
 
 gulp.task('test:run', function () {
   return gulp.src('test/*.js')
-    .pipe(g.mocha({ reporter: 'spec' }))
-    .on('error', warn)
+  .pipe(g.mocha({ reporter: 'spec' }))
+  .on('error', warn)
 })
 
 gulp.task('test', function (cb) {
@@ -63,8 +61,8 @@ gulp.task('test', function (cb) {
 
 gulp.task('lint', function () {
   return gulp.src(['gulpfile.js', 'test/*.js', 'alchemist.js'])
-    .pipe(g.jscs())
-    .on('error', warn)
+  .pipe(g.jscs())
+  .on('error', warn)
 })
 
 gulp.task('watch:lint', ['lint'], function () {
