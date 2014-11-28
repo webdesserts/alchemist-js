@@ -2,10 +2,12 @@ var gulp = require('gulp')
 var g = require('gulp-load-plugins')()
 var series = require('run-sequence')
 var del = require('del')
-var fs = require('fs')
-var package_config = require('./package.json')
 
-var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>\n'
+var package_config = require('./package.json')
+var fs = require('fs')
+var EOL = require('os').EOL
+
+var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>'+EOL
 var large_header = [
 '/**',
 ' * Alchemist.js',
@@ -14,8 +16,8 @@ var large_header = [
 ' *',
 ' * Author: <%= author %>',
 ' * Website: <%= homepage %>',
-' *',
-''].join('\n')
+' */',
+EOL].join(EOL)
 
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
