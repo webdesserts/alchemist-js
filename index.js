@@ -1,9 +1,9 @@
-var Alchemist = require('./lib/alchemist.js');
+var Alchemist = require('./lib/alchemist');
 
 var common = function common () {
   return require('alchemist-common')
 }
 
-Alchemist.common = Alchemist.prototype.common = common
+Alchemist.common = Alchemist.common = common
 
 module.exports = Alchemist
