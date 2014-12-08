@@ -134,9 +134,9 @@ XYZ - RGB - HSB
           - CMY - CMYK
 ```
 
-When you go to convert between two color spaces, Alchemist will search the tree
-figure out what the quickest convertion path to that color space and memorize
-it for the next time you need it.
+When you go to convert between two color spaces, Alchemist will search the tree,
+figure out the quickest convertion path to that color space, and memorize it for
+the next time you need it.
 
 The API
 -------
