@@ -22,7 +22,7 @@ var large_header = [
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
 
-gulp.task('build:min', ['build:web'], function () {
+gulp.task('build:min', function () {
   return gulp.src('dist/alchemist-*.js')
   .pipe(g.uglify())
   .pipe(g.header(small_header, package_config))
