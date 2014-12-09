@@ -3,7 +3,7 @@ Alchemist.js
 The extensible color library.
 
 ```js
-var alchemist = require('alchemist-js').create()
+var alchemist = require('alchemist-js')
 
 var rgb = require('alchemist-rgb')
 var hsl = require('alchemist-hsl')

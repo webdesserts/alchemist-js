@@ -16,7 +16,7 @@ which comes included with alchemist by default.
 [alchemist-common]: https://github.com/webdesserts/alchemist-common
 
 ```js
-var alchemist = require('alchemist-js').create()
+var alchemist = require('alchemist-js')
 alchemist.use(alchemist.common())
 
 alchemist.lab(70, 20, -14).rgb() // => [ 196, 159, 196 ]
