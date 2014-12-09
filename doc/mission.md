@@ -1,5 +1,5 @@
 Why Another Color Library?
---------------------------
+==========================
 
 It doesn't take long to find
 [plenty](https://github.com/gka/chroma.js)
@@ -13,7 +13,7 @@ that your current library doesn't have, you either have to dig into the source
 and fork it or... make your own. This is because of the way most color libraries
 handle **conversion paths**.
 
-### What Is A "Conversion Path", And Why Are They Important?
+## What Is A "Conversion Path", And Why Are They Important?
 
 So let's say you have an **RGB** value that you want to convert to this cool new
 [HuSL][] color space you've been hearing all about. What would that look like?
@@ -52,7 +52,7 @@ color spaces like HuSL to practically [implement their own color libraries][HuSL
 
 [HuSL libraries]: https://github.com/boronine/husl/blob/aa2afb58ccb829c8f9f3c679b96c25bfacb4552b/husl.js#L386-L400
 
-### Where Alchemist.js Comes In
+## Where Alchemist.js Comes In
 
 Alchemist attempts to solve this issue by using color space relationships to create
 a searchable conversion tree. For example:

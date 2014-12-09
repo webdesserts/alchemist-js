@@ -1,9 +1,9 @@
 Getting Started
----------------
+===============
 
 Alchemist is available as both a node.js module and web module.
 
-### Node
+## Node
 To get up and running quickly in node, install `alchemist-js` with npm
 
 ```bash
@@ -22,7 +22,7 @@ alchemist.use(alchemist.common())
 alchemist.lab(70, 20, -14).rgb() // => [ 196, 159, 196 ]
 ```
 
-### Web
+## Web
 
 Alchemist is available as a umd module thanks to webpack as well. I will include
 more information about installation soon.
