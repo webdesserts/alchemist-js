@@ -63,75 +63,30 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-
-var ColorSpaceStore = __webpack_require__(1)
-var ModifierStore = __webpack_require__(2)
-
-var helpers = __webpack_require__(3)
-
-/**=======
- * Color *
- ========*/
-
-/**
- * The constructor for all Colors.
- *
- * @constructor
- * @param {string} color_space the name of the color space this color uses
- * @param {object} value ideally this could be anything, but practically
- *                       this should be either a string, a number, or an array
- *                       of either
- * @param {options} options currently this is just an optional reference white
- */
-
-Color = function (color_space, value, options) {
-  options = options || {}
-  this.color_space = color_space
-  this.value = value
-  this.white = options.white || { X: 0.95047, Y: 1, Z: 1.08883 }
-}
-
-/**===========
- * Alchemist *
- ===========**/
+var plugins = __webpack_require__(1)
+var Color = __webpack_require__(2)
+var ColorSpace = __webpack_require__(3)
+var Converter = __webpack_require__(4)
+var ColorSpaceStore = __webpack_require__(5)
+var ModifierStore = __webpack_require__(6)
+var helpers = __webpack_require__(7)
 
 /**
  * The constructor for Alchemist. This is the object that will eventually be
  * exported.
- *
- * @constructor
- * @param {object} options Optional configuration
  */
 
-var Alchemist = function (options) {
+var Alchemist = Object.create(helpers.Createable)
+
+// Initialize all state on Alchemist
+Alchemist.init = function init (options) {
+  var color_spaces = ColorSpaceStore.create()
   options = options || {}
-  this.spaces = {}
-  this.abstract_spaces = {}
+  this.spaces = color_spaces
+  this.converter = Converter.create(color_spaces)
   this.white = options.white || null
   this.precision = options.precision || 4
 }
-
-// define any extra objects
-helpers.mixin(Alchemist.prototype, ColorSpaceStore)
-helpers.mixin(Alchemist.prototype, ModifierStore)
-
-/**
- * Convenience method for quickly creating an Alchemist instance during a require
- *
- * @param {object} options The same options you would normally pass to Alchemist
- *                         constructor.
- */
-
-Alchemist.create = function (options) {
-  return new Alchemist(options)
-}
-
-// make sure that the user can still access Alchemist in case they don't know
-// about the obj.constructor property. (necessary?)
-Alchemist.prototype.Alchemist = Alchemist
-
-// Attach the Color class to Alchemist and all of its instances
-Alchemist.Color = Alchemist.prototype.Color = Color
 
 /**
  * Interprets the type of plugin it is and calls the associated plugin installer
@@ -141,26 +96,21 @@ Alchemist.Color = Alchemist.prototype.Color = Color
  * @param {object || array} plugin The plugin to be included
  */
 
-Alchemist.prototype.use = function (plugin) {
+Alchemist.use = function use (plugin) {
   if (helpers.isArray(plugin)) {
     for (var i = 0; i < plugin.length; i++) {
       this.use(plugin[i])
     }
-  } else if (plugin.to || plugin.from) {
-    this.defineColorSpace(plugin);
-    this.makeColorMethod(plugin.name)
-  } else if (plugin.modifies) {
-    this.defineTransform(plugin);
-  } else throw new Error('unrecognized plugin format');
-}
-
-/**
- * Removes all included Color Spaces, starting with a clean slate.
- */
-
-Alchemist.prototype.removeAll = function () {
-  this.spaces = {}
-  this.abstract_spaces = {}
+  } else {
+    if (this[plugin.name] && !this.spaces.find(plugin.name))
+      throw new Error('"' + plugin.name + '" already exists on Alchemist and cannot be used as a plugin name')
+    var plugin_spaces = plugins.serialize(plugin)
+    this.spaces.merge(plugin_spaces)
+    this.spaces.each(function (color_space) {
+      if (!color_space.isAbstract)
+      this.makeColorMethod(color_space)
+    }.bind(this))
+  }
 }
 
 /**
@@ -173,22 +123,31 @@ Alchemist.prototype.removeAll = function () {
  * @param {string} color_space The name of the color space being created
  */
 
-Alchemist.prototype.makeColorMethod = function (color_space) {
+Alchemist.makeColorMethod = function makeColorMethod (color_space) {
+  var color = Color.create(color_space.name, null, { white: this.white })
+
+  // TODO Use a ColorSpace's defined conversions
+  this.spaces.each(function (color_space) {
+    if (!color_space.isAbstract) {
+      this.makeConversionMethod(color, color_space.name)
+    }
+  }.bind(this))
+
   // defined method
-  this[color_space] = function (value) {
-    var color_value;
+  this[color_space.name] = function createColor (value) {
+    var color_value, new_color;
+
     if (arguments.length > 1) {
       // I hear this deoptimizes things. Find a way around if necessary.
-      var color_value = Array.prototype.slice.call(arguments)
+      color_value = Array.prototype.slice.call(arguments)
     } else {
-      var color_value = value
+      color_value = value
     }
-    var color = new this.Color(color_space, color_value, { white: this.white })
 
-    for (var dest_name in this.spaces) {
-      this.makeConversionMethod(color, dest_name)
-    }
-    return color
+    new_color = Object.create(color)
+    color.value = color_value
+
+    return new_color
   }
 }
 
@@ -202,89 +161,15 @@ Alchemist.prototype.makeColorMethod = function (color_space) {
  *                           also, the name of the method created
  */
 
-Alchemist.prototype.makeConversionMethod = function (color, dest_name) {
+Alchemist.makeConversionMethod = function makeConversionMethod (color, dest_name) {
   var that = this
-  color[dest_name] = function () {
-    return that.round(that.convert(color, dest_name).value)
+  color[dest_name] = function convertColor () {
+    var result = that.converter.convert(this, dest_name)
+    return helpers.round(result.value, that.precision)
   }
 }
 
-/**
- * Converts a color from one color-space to another
- *
- * @param {Color} color
- * @param {string} dest
- */
-
-Alchemist.prototype.convert = function (color, dest) {
-  var converter, value, next_color, next_space;
-  var current_space = this.findColorSpace(color.color_space)
-  var dest_space = this.findColorSpace(dest)
-
-  if (!current_space) throw new Error('Internal Error: could not find the ' + current + ' color space');
-  if (!dest_space) throw new Error('Internal Error: could not find the ' + dest + ' color space');
-
-  converter = current_space.to[dest]
-  // Test to see if the current space knows how to convert to dest
-  if (typeof converter === 'function') {
-    if (helpers.isArray(color.value)) {
-      value = converter.apply(this, helpers.attemptClone(color.value).concat(color));
-    } else {
-      value = converter(helpers.attemptClone(color.value), color)
-    }
-    value = this.round(value)
-    color.color_space = dest
-    color.value = value
-    return color
-    // if the converter is a another color space
-  } else if (typeof converter === 'string') {
-    // that should mean that color space knows how to convert, so convert to
-    // that one and try from there
-    next_color = this.convert(color, converter)
-    return this.convert(next_color, dest)
-  } else {
-    // attempt to find path
-    next_space = this.mapConversionPath(color.color_space, dest)
-    // if we find the path begin stepping down it
-    if (next_space) return this.convert(color, dest);
-    // else throw an error
-    else throw new Error('Alchemist does not know how to convert from ' + color.color_space + ' to ' + dest)
-  }
-}
-
-/**
- * If the passed value is a number, it will round it. If the passed value is an
- * Array it will try to round each of it's values. the rounding is based on
- * Alchemist's precision option
- *
- * @param {object} value the object we will try to round
- */
-
-Alchemist.prototype.round = function (value) {
-  if (helpers.isArray(value)) {
-    for (var i = 0; i < value.length; i++) {
-      value[i] = this.roundIfNumber(value[i])
-    }
-  } else {
-    value = this.roundIfNumber(value)
-  }
-  return value
-}
-
-/**
- * If the value is a number, we round it to whatever the current precision setting
- * is at.
- *
- * @param {object} value the possible number to be rounded
- */
-
-Alchemist.prototype.roundIfNumber = function (value) {
-  if (typeof value === 'number') {
-    value = Number(value.toFixed(this.precision))
-  }
-  return value
-}
-
+Alchemist.init()
 // export Alchemist!
 module.exports = Alchemist
 
@@ -293,112 +178,210 @@ module.exports = Alchemist
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
+var ColorSpace = __webpack_require__(3)
+var ColorSpaceStore = __webpack_require__(5)
+var helpers = __webpack_require__(7)
 
-/**===================
- * Color Space Store *
- ===================**/
+plugins = {}
 
-var ColorSpaceStore = {}
-
-/**
- * Runs a breadth first search across the conversion tree to find the
- * quickest path from the source color space to the provided destination space.
- * It collects a crawlable list of parents to each space as it steps through
- * the tree. This can be used to retrace out steps once the destination space
- * is found.
- *
- * The parent array for a conversion path from rgb to cmyk might look something
- * like this:
- *
- * [ hsl: 'rgb', cmy: 'rgb', cmyk: 'cmy' ]
- *
- * If a path can be found it returns the parent array
- * If a path could not be found it returns null
- *
- * @param {object} src_space source space
- * @param {object} dest_space destination space
- */
-
-ColorSpaceStore.findConversionPath = function Search (src_space, dest_space) {
-  var Q = []
-  var explored = []
-  var parent = {}
-  Q.push(src_space)
-  explored.push(src_space)
-
-  while (Q.length) {
-    var space = Q.pop()
-    if (space === dest_space) { return parent }
-    var neighbors = this.findNeighbors(space)
-
-    for (var i = 0; i < neighbors.length; i++) {
-      var neighbor = neighbors[i]
-
-      // if this space hasn't been explored yet
-      if (explored.indexOf(neighbor) === -1) {
-        parent[neighbor] = space
-        explored.push(neighbor)
-        Q.push(neighbor)
-      }
-    }
-  }
-  return null
+plugins.serialize = function serialize (plugin) {
+  if (plugin.to || plugin.from) {
+    return this.serializeColorSpace(plugin)
+  } else if (plugin.modifies) {
+    return this.serializeModifier(plugin)
+  } else throw new Error('unrecognized plugin format');
 }
 
-/**
- * For a given color space, collect a list of neighboring color spaces
- *
- * @param {string} color_space the name of the color space to be searched
- */
+plugins.serializeColorSpace = function serializeColorSpace (plugin) {
+  var results, color_space, abstract_space;
 
-ColorSpaceStore.findNeighbors = function findNeighbors (color_space) {
-  var neighbors = []
-  var conversions = this.spaces[color_space].to
-  for (conv_space in conversions) {
-    if (typeof conversions[conv_space] === 'function') {
-      neighbors.push(conv_space)
-    }
+  if (typeof plugin.name !== 'string') throw Error('Error: color-space plugin is missing a name')
+
+  results = ColorSpaceStore.create()
+  color_space = ColorSpace.create(plugin.name)
+  results.add(color_space)
+
+  for (dest_name in plugin.to) {
+    color_space.defineConvTo(dest_name, plugin.to[dest_name])
   }
-  return neighbors
+
+  for (src_name in plugin.from) {
+    abstract_space = ColorSpace.create(src_name, { abstract: true })
+    abstract_space.defineConvTo(plugin.name, plugin.from[src_name])
+    results.add(abstract_space)
+  }
+
+  return results
 }
 
-/**
- * Short Description:
- * Maps the steps necessary to convert from one color space to another
- *
- * Long Description:
- * First tries to find a path. If there is none, we return null
- *
- * Then steps backward through the path found in findConversionPath and sets the
- * crawlable path by defining a "next step" pointer on color spaces along the
- * path of a conversion
- *
- * If you couldn't tell already this function is super fucking confusing because
- * it's hard to think backwards and because I am horrible at writing code so gl;hf
- *
- * @param {string} current_space start of the conversion path
- * @param {string} target_space end of the conversion path
- */
+plugins.serializeModifier = function serializeModifier (plugin) {
+  throw new Error('Modifiers aren\'t implemented yet! Sorry!')
+}
 
-ColorSpaceStore.mapConversionPath = function mapConversionPath (current_space, target_space) {
+module.exports = plugins
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+var helpers = __webpack_require__(7)
+
+var Color = Object.create(helpers.Createable)
+
+Color.init = function init (color_space, value, options) {
+  options = options || {}
+  this.color_space = color_space
+  this.value = value
+  this.white = options.white || { X: 0.95047, Y: 1, Z: 1.08883 }
+}
+
+module.exports = Color
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+var helpers = __webpack_require__(7)
+var ColorSpace = Object.create(helpers.Createable)
+
+// initialize all state
+ColorSpace.init = function init (name, options) {
+  var options = options || {}
+  this.name = name
+  this.conversions = {}
+  this.isAbstract = options.abstract || false
+}
+
+// define a conversion to another color space
+ColorSpace.defineConvTo = function defineConvTo (space_name, conversion) {
+  if (typeof conversion !== 'function') throw TypeError('Expected the conversion, ' + conversion + ', to be a function')
+  this.conversions[space_name] = conversion
+}
+
+ColorSpace.definePointerTo = function definePointerTo (target, pointer) {
+  if (typeof pointer !== 'string') throw TypeError('Expected the pointer, ' + pointer + ', to be a string')
+  this.conversions[target] = pointer
+}
+
+// return a known conversion to antoher color space
+ColorSpace.to = function to (space_name) {
+  return this.conversions[space_name] || null }
+
+ColorSpace.merge = function merge (color_space) {
+  var options = options || {}
+  var conversions = color_space.conversions
+  // If we're merging like so...
+  // abstract_space.merge(concrete_space)
+  // use all the concrete space's conversions by default
+  var curing = this.isAbstract && !color_space.isAbstract
+
+  for (dest_space in conversions) {
+    if (curing || !this.to(dest_space)) {
+      var conversion = conversions[dest_space]
+      this.defineConvTo(dest_space, conversion)
+    }
+  }
+
+  // when the conversion is over, make the abstract space concrete
+  if (curing) this.isAbstract = false
+}
+
+// lock down some properties
+Object.defineProperties(ColorSpace, {
+  defineConvTo: { writable: false },
+  to: { writable: false }
+})
+
+// export the module
+module.exports = ColorSpace
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+var helpers = __webpack_require__(7)
+
+var Converter = Object.create(helpers.Createable)
+
+Converter.init = function init (color_spaces, context) {
+  this.spaces = color_spaces
+  this.context = context || null
+}
+
+Converter.convert = function convert (color, target_name) {
+  var current_name = color.color_space
+  var current_space = this.spaces.find(current_name)
+  var target_space = this.spaces.find(target_name)
+
+  if (!current_space) throw new Error('could not find the ' + current_name + ' color space');
+  if (!target_space) throw new Error('could not find the ' + target_name + ' color space');
+
+  var conversion = current_space.to(target_name)
+  // Test to see if the current space knows how to convert to target
+  if (typeof conversion === 'function') {
+    return this.applyConversion(color, target_name, conversion)
+  // if the conversion is a another color space
+  } else if (typeof conversion === 'string') {
+    var next_color = this.followPointer(color, current_space, conversion)
+    return this.convert(next_color, target_name)
+  } else {
+    // attempt to find path
+    var next_space = this.mapConversionPath(current_name, target_name)
+
+    // if we find the path begin stepping down it
+    if (next_space) return this.convert(color, target_name);
+
+    // else throw an error
+    else throw new Error('Alchemist does not know how to convert from ' + current_space.name + ' to ' + target_space.name)
+  }
+}
+
+Converter.applyConversion = function applyConversion (color, target, conversion) {
+  var value;
+  if (helpers.isArray(color.value)) {
+    value = conversion.apply(this.context, helpers.clone(color.value).concat(color));
+  } else {
+    value = conversion(helpers.clone(color.value), color)
+  }
+  value = helpers.round(value)
+  color.color_space = target
+  color.value = value
+  return color
+}
+
+Converter.followPointer = function followPointer (color, current_space, pointer) {
+  // that should mean that color space knows how to convert, so convert to
+  // that one and try from there
+  var conversion = current_space.to(pointer)
+  if (typeof conversion !== 'function') throw new TypeError('Expected the pointer, ' + pointer  + ', to point to a function; Instead found  ' + conversion )
+  return this.applyConversion(color, pointer, conversion)
+}
+
+Converter.mapConversionPath = function mapConversionPath (current, target) {
+  var conversion
   // Is there a path?
-  var parents = this.findConversionPath(current_space, target_space)
+  var parents = this.findConversionPath(current, target)
   // if not return null
   if (!parents) return null;
 
-  var next_space = parents[target_space]
+  var next_space = parents[target]
   var space = parents[next_space]
 
   var steps_taken = 0
 
   // step backwards through the parent array and leave "next step" instructions along the way
   while (steps_taken < 100) {
-    if (!this.spaces[space].to[target_space] || typeof this.spaces[space].to[target_space] !== 'function') {
-      this.spaces[space].to[target_space] = next_space
+    conversion = this.spaces.find(space).to(target)
+
+    if (!conversion || typeof conversion !== 'function') {
+      this.spaces.find(space).definePointerTo(target, next_space)
     }
 
     // if we're finished mapping, go ahead and tell us how to start the conversion
-    if (space === current_space) return next_space;
+    if (space === current) return next_space;
     else if (!parents[space]) return null;
 
     // take a step backwards
@@ -410,158 +393,116 @@ ColorSpaceStore.mapConversionPath = function mapConversionPath (current_space, t
   throw new Error('something went wrong while mapping the path from' + current_space + ' to ' + target_space)
 }
 
-/**
- * Creates a Color Space
- *
- * If there are any included conversions for a Color Space that
- * do not already exist, it will store them in an Abstract Space.
- *
- * @param {object} color_space
- */
+Converter.findConversionPath = function findConversionPath (current_space, target_space) {
+  var Q = []
+  var explored = []
+  var parent = {}
+  Q.push(current_space)
+  explored.push(current_space)
 
-ColorSpaceStore.defineColorSpace = function (color_space) {
-  var mine = color_space.name
+  while (Q.length) {
+    var space = Q.pop()
+    if (space === target_space) { return parent }
+    var neighbors = this.spaces.findNeighbors(space)
 
-  // make sure the name doesn't exist yet
-  this.validateName(mine)
-  // if space already exists as an abstract space
-  if (this.isAbstractSpace(mine))
-    this.makeConcrete(mine)
-  else
-    this.createSpace(mine)
+    // for each neighbor
+    for (var i = 0; i < neighbors.length; i++) {
+      var neighbor = neighbors[i]
 
-  for (var theirs in color_space.to) {
-    var conversion = color_space.to[theirs]
-    if (this.isColorSpace(theirs))
-      this.defineConversion(mine, theirs, conversion)
-    else
-      this.defineAbstractConversion(theirs, mine, 'from', conversion)
+      // if this neighbor hasn't been explored yet
+      if (explored.indexOf(neighbor) === -1) {
+        parent[neighbor] = space
+        explored.push(neighbor)
+        Q.push(neighbor)
+      }
+    }
   }
-  for (var theirs in color_space.from) {
-    var conversion = color_space.from[theirs]
-    if (this.isColorSpace(theirs))
-      this.defineConversion(theirs, mine, conversion)
-    else
-      this.defineAbstractConversion(theirs, mine, 'to', conversion)
+  return null
+}
+
+module.exports = Converter
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+var ColorSpace = __webpack_require__(3)
+var helpers = __webpack_require__(7)
+
+var ColorSpaceStore = Object.create(helpers.Createable)
+
+ColorSpaceStore.init = function init () {
+  this.store = []
+}
+
+ColorSpaceStore.add = function add (color_space) {
+  this.store.push(color_space)
+}
+
+ColorSpaceStore.find = function find (space_name) {
+  var i = this.findIndex(space_name)
+  return this.store[i] || null
+}
+
+ColorSpaceStore.findIndex = function findIndex (space_name) {
+  var result = this.each(function (space, i) {
+    if (space.name === space_name) return i;
+  })
+  return result
+}
+
+ColorSpaceStore.findNeighbors = function findNeighbors (space_name) {
+  var neighbors = []
+  var color_space = this.find(space_name)
+
+  if (color_space === null) return neighbors;
+
+  var conversions = color_space.conversions
+
+  for (target in conversions) {
+    var target_space = this.find(target)
+    if (target_space && !target_space.isAbstract)
+      neighbors.push(target);
+  }
+  return neighbors
+}
+
+ColorSpaceStore.has = function has (space_name) {
+  var i = this.findIndex(space_name)
+  return Boolean(i || i === 0)
+}
+
+ColorSpaceStore.remove = function remove (space_name) {
+  var i = this.findIndex(space_name)
+  this.store.splice(i, 1)
+}
+
+ColorSpaceStore.each = function each (func, context) {
+  return helpers.each.call(this, this.store, func, context)
+}
+
+ColorSpaceStore.merge = function merge (external_store) {
+  external_store.each(function (color_space) {
+    this.mergeColorSpace(color_space)
+  }.bind(this))
+}
+
+ColorSpaceStore.mergeColorSpace = function mergeColorSpace (color_space) {
+  var name = color_space.name
+  local_space = this.find(name)
+  if (!local_space) {
+    this.add(color_space)
+  } else {
+    local_space.merge(color_space)
   }
 }
-
-/**
- * Stores a Conversion between two spaces
- * Expects both spaces to already be included
- *
- * @param {string} mine
- * @param {string} theirs
- * @param {object} conversion
- */
-
-ColorSpaceStore.defineConversion = function (mine, theirs, conversion) {
-  this.spaces[mine].to[theirs] = conversion
-}
-
-/**
- * Stores a Conversion that we know about, but are not yet using
- * Creates an Abstract Space for the conversion, if one does not already exist
- *
- * @param {string} mine
- * @param {string} theirs
- * @param {string} direction
- * @param {function} conversion
- */
-
-ColorSpaceStore.defineAbstractConversion = function (mine, theirs, direction, conversion) {
-  var abstract_spaces = this.abstract_spaces
-  if (!abstract_spaces[mine]) this.createAbstractSpace(mine);
-
-  abstract_spaces[mine][direction][theirs] = conversion
-}
-
-/**
- * Validates to make sure that we are not overriding any existing methods
- *
- * @param {string} name
- */
-
-ColorSpaceStore.validateName = function (name) {
-  if (this[name]) {
-    if (!this.spaces[name]) throw new Error('Invalid Name:', name, 'is already the name of one of alchemist\'s private functions and can not be used as a the name of an color space')
-      else throw new Error('"' + name + '" Already Exists: there is a space with the same name already in use')
-  }
-}
-
-/**
- * creates the initial Color Space object
- *
- * @param {string} color_space the name of the color space
- */
-
-ColorSpaceStore.createSpace = function (color_space) {
-  this.spaces[color_space] = { to: {} }
-}
-
-/**
- * Does this Color Space exist yet?
- *
- * @param {string} color_space the name of the color space
- * @returns {Boolean}
- */
-
-ColorSpaceStore.isColorSpace = function (color_space) {
-  return Boolean(this.spaces[color_space])
-}
-
-/**
- * Creates the initial Abstract Space object
- *
- * @param {string} abstract_space the name of the abstract space
- */
-
-ColorSpaceStore.createAbstractSpace = function (abstract_space) {
-  this.abstract_spaces[abstract_space] = { to: {}, from: {} }
-}
-
-/**
- * Is this currently defined as an Abstract Space?
- *
- * @param {string} color_space the name of the color space
- * @returns {Boolean}
- */
-
-ColorSpaceStore.isAbstractSpace = function (color_space) {
-  return Boolean(this.abstract_spaces[color_space])
-}
-
-/**
- * Turn an Abstract Space into a normal Color Space
- *
- * @param {string} abstract_space
- */
-
-ColorSpaceStore.makeConcrete = function (abstract_space) {
-  var space_obj = this.abstract_spaces[abstract_space]
-  delete this.abstract_spaces[abstract_space]
-  space_obj.name = abstract_space
-  this.defineColorSpace(space_obj)
-}
-
-/**
- * If the given color space exists already, it will return that colorspace,
- * else it will return null
- *
- * @param {string} color_space
- * @returns {object}
- */
-
-ColorSpaceStore.findColorSpace = function (color_space) {
-  return this.spaces[color_space] || null
-}
-
 
 module.exports = ColorSpaceStore
 
 
 /***/ },
-/* 2 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 
@@ -571,15 +512,11 @@ module.exports = ColorSpaceStore
 
 var ModifierStore = {}
 
-ModifierStore.defineModifier = function (modifier) {
-  throw new Error('Modifiers are not yet implemented')
-}
-
 module.exports = ModifierStore
 
 
 /***/ },
-/* 3 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 
@@ -588,74 +525,34 @@ module.exports = ModifierStore
  =========**/
 
 /**
- * Mix all the things!
- *
- * Defines all the properties of the giving_obj on the receiving_obj. This
- * does not include properties higher up in the prototype chain.
- *
- * Also allows you to name the methods you want mixed
- *
- * @param {object} receiving_obj object receiving the properties
- * @param {object} giving_obj object that the properties will be taken from
- *
- * (thanks addyosamani)
- */
-
-exports.mixin = function (receiving_obj, giving_obj) {
-  // allows you to only mix in a set set of methods
-  if (arguments[2]) {
-    for (var i = 2, len = arguments.length; i < len; i++) {
-      receiving_obj[arguments[i]] = giving_obj[arguments[i]]
-    }
-    // otherwise, mix all the things! (does not mix existing properties)
-  } else {
-    for (var method_name in giving_obj) {
-      if (!Object.hasOwnProperty.call(receiving_obj, method_name)) {
-        receiving_obj[method_name] = giving_obj[method_name]
-      }
-    }
-    receiving_obj
-  }
-  return receiving_obj
-}
-
-/**
  * copy the original object's properties onto a new object and returns it
  *
  * @param {object} original object to be cloned
  */
 
-exports.clone = function (original) {
-  var Con = original.constructor
+exports.clone = function clone (target) {
+  "use strict";
+  var cloned;
 
-  if (typeof original === 'string' || typeof original === 'number')
-    return new Con(original)
+  var obj = Object(target);
 
-  if (isArray(original)) {
-    var cloned_array = []
-    for (var i = 0; i < original.length; i++) {
-      cloned_array[i] = original[i]
-    }
-    return cloned_array
+  switch (obj.constructor) {
+    case String:
+      cloned = obj.toString()
+      break;
+    case Number:
+      cloned = Number(obj)
+      break;
+    case Array:
+      cloned = []
+      this.each(obj, function (item, i) {
+        cloned[i] = clone(item)
+      })
+      break;
+    default:
+      throw new TypeError('Alchemist does not know how to clone ' + target)
   }
-
-  if (typeof original == 'object')
-    return mixin({}, original)
-
-  return null
-}
-
-/**
- * Same as clone, but just returns the original object when it doesn't recognize
- * the object. This is a dangerous function and should be used scarecely if at
- * all
- *
- * @param {object} orignal object to be cloned
- */
-
-exports.attemptClone = function (original) {
-  var cloned = this.clone(original);
-  return cloned || original
+  return cloned;
 }
 
 /**
@@ -667,6 +564,59 @@ exports.attemptClone = function (original) {
 
 exports.isArray = function isArray (object) {
   return Array.isArray(object)
+}
+
+exports.each = function each (array, func, context) {
+  var length = array.length
+  var result;
+  context = context || null
+  for (var i = 0; i < length; i++) {
+    result = func.call(context, array[i], i)
+    if (result != undefined) return result
+  }
+return null
+}
+
+/**
+ * If the passed value is a number, it will round it. If the passed value is an
+ * Array it will try to round each of it's values. the rounding is based on
+ * Alchemist's precision option
+ *
+ * @param {object} value the object we will try to round
+ */
+
+exports.round = function (value, precision) {
+  precision = precision || 4
+  if (exports.isArray(value)) {
+    for (var i = 0; i < value.length; i++) {
+      value[i] = this.roundIfNumber(value[i], precision)
+    }
+  } else {
+    value = this.roundIfNumber(value, precision)
+  }
+  return value
+}
+
+/**
+ * If the value is a number, we round it to whatever the current precision setting
+ * is at.
+ *
+ * @param {object} value the possible number to be rounded
+ */
+
+exports.roundIfNumber = function (value, precision) {
+  if (typeof value === 'number') {
+    value = Number(value.toFixed(precision))
+  }
+  return value
+}
+
+exports.Createable = {
+  create: function () {
+    var obj = Object.create(this)
+    if (obj.init) obj.init.apply(obj, arguments);
+    return obj
+  }
 }
 
 
