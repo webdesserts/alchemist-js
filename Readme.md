@@ -23,7 +23,7 @@ run into any problems. Thanks!
 Documentation
 -------------
 
-- [Getting Started](/doc/api.md)
+- [Getting Started](/doc/getting-started.md)
 - [API](/doc/api.md)
 - [Plugins](/doc/plugins.md)
 - [Why Alchemist.js?](/doc/mission.md)
