@@ -53,9 +53,9 @@ heavily inspired by, or taken directly out of one of these libraries:
 - [d3.js](https://github.com/mbostock/d3/wiki/Colors)
 - and many more...
 
-Also, extra special thanks to Bruce Lindbloom, who got me believing that I
-could make something like this.
+Also, extra special thanks to a few individuals who helped me along the way.
 
-- [Bruce Lindbloom](http://www.brucelindbloom.com/)
+- [Bruce Lindbloom](http://www.brucelindbloom.com/) - Who's website inspired me to create alchemist.
+- [Lon Ingram](https://twitter.com/lawnsea) - Who suggested the breadth-first search, which I use to make the plugin system possible.
 
 Thanks to all of you!
