@@ -69,14 +69,14 @@ describe('Converter', function () {
   describe('convert', function () {
     describe('when the target color space is adjacet', function () {
       it('just converts the color', function () {
-        var color = Color.create('rgb', 'rgb')
+        var color = color_spaces.find('rgb').Color.create('rgb')
         var new_color = converter.convert(color, 'xyz')
         expect(new_color.value).to.eq('rgb xyz')
       })
     })
     describe('when the target color space is a few steps away', function () {
       it('figures out the conversion path', function () {
-        var color = Color.create('rgb', 'rgb')
+        var color = color_spaces.find('rgb').Color.create('rgb')
         var new_color = converter.convert(color, 'lab')
         expect(new_color.value).to.eq('rgb xyz lab')
       })
@@ -84,7 +84,7 @@ describe('Converter', function () {
   })
   describe('applyConversion', function () {
     it('applys the conversion to the color', function () {
-      var color = Color.create('rgb', [255, 255, 255])
+      var color = Color.create([255, 255, 255], 'rgb')
       var conversion = function (r, g, b) {
         r /= 255
         g /= 255
@@ -95,7 +95,7 @@ describe('Converter', function () {
       expect(result.value).to.deep.eq([1, 1, 1])
     })
     it('supplies the color obj as the last argument', function () {
-      var color = Color.create('rgb', [255, 255, 255])
+      var color = Color.create([255, 255, 255], 'rgb')
       var conversion = function (r, g, b, color) {
         expect(Color.isPrototypeOf(color)).to.be.true
         expect(color.value).to.deep.eq([255, 255, 255])
@@ -104,14 +104,14 @@ describe('Converter', function () {
       converter.applyConversion(color, 'myrgb', conversion)
     })
     it('applies assigns the new color to color space it was converted to', function () {
-      var color = Color.create('rgb', [255, 255, 255])
+      var color = Color.create([255, 255, 255], 'rgb')
       var conversion = function (r, g, b, color) { return 'bla' }
       var new_color = converter.applyConversion(color, 'myrgb', conversion)
       expect(new_color.color_space).to.eq('myrgb')
     })
   })
   describe('followPointer', function () {
-    it('calls the function accosiated with the color space the pointer refers to.', function () {
+    it('calls the function associated with the color space the pointer refers to.', function () {
       var color = Color.create('rgb', 'rgb')
 
       var new_color = converter.followPointer(color, color_spaces.find('rgb'), 'xyz')
