@@ -18,46 +18,46 @@ describe('Converter', function () {
       }
     }
 
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'xyz',
       to: {}
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'rgb',
       to:   { 'xyz': tracePath('xyz') },
       from: { 'xyz': tracePath('rgb') }
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'cmy',
       to:   { 'rgb': tracePath('rgb') },
       from: { 'rgb': tracePath('cmy') }
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'cmyk',
       to:   { 'cmy': tracePath('cmy') },
       from: { 'cmy': tracePath('cmyk') }
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'hsl',
       to:   { 'rgb': tracePath('rgb') },
       from: { 'rgb': tracePath('hsl') }
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'lab',
       to:   { 'xyz': tracePath('xyz') },
       from: { 'xyz': tracePath('lab') }
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'lchab',
       to:   { 'lab': tracePath('lab') },
       from: { 'lab': tracePath('lchab') }
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'luv',
       to:   { 'xyz': tracePath('xyz') },
       from: { 'xyz': tracePath('luv') }
     }))
-    color_spaces.merge(plugins.serialize({
+    color_spaces.merge(plugins.serializeColorSpace({
       name: 'lchuv',
       to:   { 'luv': tracePath('luv') },
       from: { 'luv': tracePath('lchuv') }
