@@ -4,6 +4,19 @@ var ColorSpaceStore = require('../lib/colorSpaceStore')
 var expect = require('chai').expect
 
 describe('plugins', function () {
+  describe('type', function () {
+    it('returns "space" when it\'s a color space', function () {
+      var rgb = { name: 'rgb', to: {}, from: {} }
+      expect(plugins.type(rgb)).to.eq('space')
+    })
+    it('returns "method" when it\'s a color method')
+    it('throws an error if we can\'t recognize the plugin', function () {
+      var func = function () {}
+      var invalid = { naem: 'arrgeebea' }
+      expect(plugins.type.bind(null, func)).to.throw(Error)
+      expect(plugins.type.bind(null, invalid)).to.throw(Error)
+    })
+  })
   describe('serializeColorSpace', function () {
     var rgb, unnamed, broken;
 
