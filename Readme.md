@@ -27,7 +27,7 @@ Documentation
 - [Getting Started](/doc/getting-started.md)
 - [API](/doc/api.md)
 - [Plugins](/doc/plugins.md)
-- [Contributing](/contributing.md)
+- [Contributing](/Contributing.md)
 
 What's in the Pipeline?
 -----------------------
