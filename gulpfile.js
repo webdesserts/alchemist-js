@@ -56,7 +56,7 @@ gulp.task('test:run', function () {
 })
 
 gulp.task('test', function (cb) {
-  series('build', 'test:run', 'lint', cb)
+  series('test:run', 'lint', cb)
 })
 
 gulp.task('lint', function () {
