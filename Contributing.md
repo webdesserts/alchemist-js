@@ -22,7 +22,6 @@ When submitting pull requests
 Development
 -----------
 
-- `npm test` runs all tests
-- `npm run lint` lints all tests
+- `npm test` lints everything and runs tests
 - `npm run build` builds web files
 - `npm run dev` watches for files changes and lints, tests, and builds alchemist
