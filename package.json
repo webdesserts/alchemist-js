@@ -4,9 +4,8 @@
   "description": "An extensible color library",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "gulp test --silent",
     "dev": "gulp dev --silent",
-    "lint": "gulp lint --silent",
     "build": "gulp build --silent"
   },
   "keywords": [
