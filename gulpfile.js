@@ -69,10 +69,12 @@ gulp.task('watch:lint', ['lint'], function () {
   gulp.watch(['gulpfile.js', '.jscsrc', 'test/*.js', 'alchemist.js'], ['lint'])
 })
 
-gulp.task('default', ['test'], function () {
+gulp.task('dev', ['test'], function () {
   gulp.watch('test/*.js', ['test'])
   gulp.watch('lib/*.js', ['test', 'lint'])
 })
+
+gulp.task('default', ['build'])
 
 function warn (err) {
   console.warn(err.message)

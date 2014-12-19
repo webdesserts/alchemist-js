@@ -23,10 +23,11 @@ run into any problems. Thanks!
 Documentation
 -------------
 
+- [Why Alchemist.js?](/doc/mission.md)
 - [Getting Started](/doc/getting-started.md)
 - [API](/doc/api.md)
 - [Plugins](/doc/plugins.md)
-- [Why Alchemist.js?](/doc/mission.md)
+- [Contributing](/contributing.md)
 
 What's in the Pipeline?
 -----------------------
