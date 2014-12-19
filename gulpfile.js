@@ -4,7 +4,6 @@ var series = require('run-sequence')
 var del = require('del')
 
 var package_config = require('./package.json')
-var fs = require('fs')
 var EOL = require('os').EOL
 
 var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>' + EOL
