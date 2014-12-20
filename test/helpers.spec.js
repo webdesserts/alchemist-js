@@ -2,7 +2,7 @@ var helpers = require('../lib/helpers')
 var expect = require('chai').expect
 
 describe('helpers', function () {
-  describe('round', function () {
+  describe('.round(value, [precision])', function () {
     describe('when given a number', function () {
       it('rounds the number', function () {
         var rounded = helpers.round(6.6666666)
@@ -28,7 +28,7 @@ describe('helpers', function () {
     })
   })
 
-  describe('each', function () {
+  describe('.each(collection, function, [context])', function () {
     describe('when given an array', function () {
       it('calls <function> with the value and index for each item', function () {
         var array = [1, 2, 3]
@@ -66,7 +66,7 @@ describe('helpers', function () {
     })
   })
 
-  describe('clone', function () {
+  describe('.clone(obj)', function () {
     it('can clone Strings', function () {
       var obj1 = { val: 'hello' }
       var cloned = helpers.clone(obj1.val)
@@ -93,8 +93,8 @@ describe('helpers', function () {
     })
   })
 
-  describe('Createable', function () {
 
+  describe('.Createable', function () {
     var Obj;
     before(function () {
       Obj = Object.create(helpers.Createable)
