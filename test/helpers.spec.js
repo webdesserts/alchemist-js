@@ -93,6 +93,21 @@ describe('helpers', function () {
     })
   })
 
+  describe('.isArray(obj)', function () {
+    var array, obj, string;
+    before(function () {
+      array = [1, 2, 3]
+      obj = { an: 'array', I: 'swear' }
+      string = 'an array, I swear'
+    })
+    it('returns true if <obj> is an array', function () {
+      expect(helpers.isArray(array)).to.be.true
+    })
+    it('returns false if <obj> is not an array', function () {
+      expect(helpers.isArray(obj)).to.be.false
+      expect(helpers.isArray(string)).to.be.false
+    })
+  })
 
   describe('.Createable', function () {
     var Obj;
