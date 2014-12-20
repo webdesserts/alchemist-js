@@ -29,17 +29,21 @@ describe('helpers', function () {
   })
 
   describe('.each(collection, function, [context])', function () {
+    var array, obj;
+
+    beforeEach(function () {
+      array = [1, 0, 3, 4]
+      obj = { a: 1, b: 0, c: 3, d: 4 }
+    })
+
     describe('when given an array', function () {
       it('calls <function> with the value and index for each item', function () {
-        var array = [1, 2, 3]
         helpers.each(array, function (val, i) {
           array[i] = val + 5
         })
-        expect(array).to.deep.eql([6, 7, 8])
+        expect(array).to.deep.eql([6, 5, 8, 9])
       })
-
       it('returns any value returned from <function> and stops iterating', function () {
-        var array = [1, 0, 3, 4]
         var result = helpers.each(array, function (val, i) {
           if (val === 0) return val;
           if (val === 3) throw new Error('I did not stop iterating');
@@ -47,22 +51,32 @@ describe('helpers', function () {
         expect(result).to.eq(0)
       })
     })
+
     describe('when given an object', function () {
       it('calls <function> with the value and key for each item', function () {
-        var obj = { a: 1, b: 0, c: 3, d: 4 }
         helpers.each(obj, function (val, key) {
           obj[key] = key + val
         })
         expect(obj).to.deep.eq({ a: 'a1', b: 'b0', c: 'c3', d: 'd4' })
       })
       it('returns any value returned from <function> and stops iterating', function () {
-        var obj = { a: 1, b: 0, c: 3, d: 4 }
         var result = helpers.each(obj, function (val, key) {
           if (val === 0) return key;
           if (val === 3) throw new Error('I did not stop iterating');
         })
         expect(result).to.eq('b')
       })
+    })
+
+    it('binds the <function> with <context> if present', function () {
+      var that;
+      var my_context = {}
+
+      helpers.each(array, function (val, i) {
+        return that = this
+      }, my_context)
+
+      expect(that).to.eq(my_context)
     })
   })
 
