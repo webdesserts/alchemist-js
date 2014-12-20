@@ -74,12 +74,12 @@ describe('helpers', function () {
   })
 
   describe('Createable', function () {
-    describe('create', function () {
-      var Obj;
-      before(function () {
-        Obj = Object.create(helpers.Createable)
-      })
 
+    var Obj;
+    before(function () {
+      Obj = Object.create(helpers.Createable)
+    })
+    describe('.create([params...])', function () {
       it('calls Object.create on itself and returns the result', function () {
         var new_obj = Obj.create()
         expect(Obj.isPrototypeOf(new_obj)).to.be.true
@@ -97,6 +97,16 @@ describe('helpers', function () {
         var new_obj = Obj.create('hello world')
         expect(new_obj.message).to.eq('hello world')
         expect(Obj.message).to.be.undefined
+      })
+    })
+    describe('.proto', function () {
+      it('references the prototype of this object', function () {
+        expect(Obj.proto).to.eq(helpers.Createable)
+      })
+      it('cannot be set', function () {
+        expect(function () {
+          Obj.proto = {}
+        }).to.throw(Error)
       })
     })
   })
