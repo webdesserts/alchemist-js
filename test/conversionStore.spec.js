@@ -100,15 +100,18 @@ describe('ConversionStore', function () {
     })
   })
   describe('.merge(external_store)', function () {
-    var rgb2, lab, foreign_store;
+    var rgb2, lab, luv, foreign_store;
     beforeEach(function () {
       rgb2 = function () {}
       lab = function () {}
+      luv = function () {}
       conversions.add('rgb', rgb)
       conversions.add('xyz', xyz)
+      conversions.add('luv', 'xyz')
       foreign_store = ConversionStore.create()
       foreign_store.add('lab', lab)
       foreign_store.add('rgb', rgb2)
+      foreign_store.add('luv', luv)
     })
     it('adds the conversion if it does not yet exist in this store', function () {
       conversions.merge(foreign_store)
@@ -117,6 +120,10 @@ describe('ConversionStore', function () {
     it('keeps the current conversion if both stores have the same conversion', function () {
       conversions.merge(foreign_store)
       expect(conversions.store.rgb).to.eq(rgb)
+    })
+    it('uses the a foreign conversion if the local conversion is just a pointer', function () {
+      conversions.merge(foreign_store)
+      expect(conversions.store.luv).to.eq(luv)
     })
     describe('when options.force is true', function () {
       it('adds the conversion if it does not yet exist in this store', function () {
