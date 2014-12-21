@@ -96,7 +96,7 @@ describe('Storage', function () {
       expect(that).to.eq(my_context)
     })
   })
-  describe('.merge(giving_store)', function () {
+  describe('.merge(foreign_store)', function () {
     var a2, d, foreign_store;
     beforeEach(function () {
       var merge = function (other) {

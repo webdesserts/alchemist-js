@@ -99,7 +99,7 @@ describe('ConversionStore', function () {
       expect(that).to.eq(my_context)
     })
   })
-  describe('.merge(external_store)', function () {
+  describe('.merge(foreign_store)', function () {
     var rgb2, lab, luv, foreign_store;
     beforeEach(function () {
       rgb2 = function () {}
