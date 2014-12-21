@@ -105,33 +105,40 @@ describe('ConversionStore', function () {
       rgb2 = function () {}
       lab = function () {}
       luv = function () {}
-      conversions.add('rgb', rgb)
-      conversions.add('xyz', xyz)
-      conversions.add('luv', 'xyz')
       foreign_store = ConversionStore.create()
-      foreign_store.add('lab', lab)
-      foreign_store.add('rgb', rgb2)
-      foreign_store.add('luv', luv)
     })
     it('adds the conversion if it does not yet exist in this store', function () {
+      foreign_store.add('lab', lab)
       conversions.merge(foreign_store)
+
       expect(conversions.store.lab).to.eq(lab)
     })
     it('keeps the current conversion if both stores have the same conversion', function () {
+      conversions.add('rgb', rgb)
+      foreign_store.add('rgb', rgb2)
       conversions.merge(foreign_store)
+
       expect(conversions.store.rgb).to.eq(rgb)
     })
     it('uses the a foreign conversion if the local conversion is just a pointer', function () {
+      conversions.add('luv', 'xyz')
+      foreign_store.add('luv', luv)
       conversions.merge(foreign_store)
+
       expect(conversions.store.luv).to.eq(luv)
     })
     describe('when options.force is true', function () {
       it('adds the conversion if it does not yet exist in this store', function () {
+        foreign_store.add('lab', lab)
         conversions.merge(foreign_store, { force: true })
+
         expect(conversions.store.lab).to.eq(lab)
       })
       it('uses the foreign store  if both stores have the same conversion', function () {
+        conversions.add('rgb', rgb)
+        foreign_store.add('rgb', rgb2)
         conversions.merge(foreign_store, { force: true })
+
         expect(conversions.store.rgb).to.eq(rgb2)
       })
     })
