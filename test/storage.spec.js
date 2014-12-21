@@ -43,7 +43,7 @@ describe('Storage', function () {
     it('returns true if the <key> is present', function () {
       expect(storage.has('a')).to.be.true
     })
-    it('returns false if the <key> is present', function () {
+    it('returns false if the <key> is not present', function () {
       expect(storage.has('b')).to.be.false
     })
   })
