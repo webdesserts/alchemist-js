@@ -1,58 +1,51 @@
-var ColorSpace = require('../lib/colorSpace')
+var Color = require('../lib/color')
 var ColorSpaceStore = require('../lib/colorSpaceStore')
+var ConversionStore = require('../lib/conversionStore')
 var expect = require('chai').expect
 
 describe('ColorSpaceStore', function () {
-  var color_spaces, rgb, xyz, hsl;
+  var color_spaces, rgb, xyz, hsl, ColorSpace;
 
   before(function () {
-    rgb = ColorSpace.create('rgb')
-    xyz = ColorSpace.create('xyz')
-    hsl = ColorSpace.create('hsl')
+    ColorSpace = function ColorSpace (name, abstract) {
+      return Color.create({
+        type: name,
+        abstract: abstract,
+        conversions: ConversionStore.create()
+      })
+    }
+
+    rgb = ColorSpace('rgb')
+    xyz = ColorSpace('xyz')
+    hsl = ColorSpace('hsl')
   })
 
-  describe('add', function () {
+  describe('.add(color_space)', function () {
     it('adds a ColorSpace', function () {
       color_spaces = ColorSpaceStore.create()
       color_spaces.add(rgb)
 
-      expect(color_spaces.store).to.contain(rgb)
+      expect(color_spaces.store.rgb).to.eq(rgb)
     })
   })
 
-  describe('remove', function () {
+  describe('.remove(space_name)', function () {
     before(function () {
       color_spaces = ColorSpaceStore.create()
       color_spaces.add(rgb)
       color_spaces.add(xyz)
       color_spaces.add(hsl)
-      color_spaces.remove('rgb')
     })
     it('safely removes a ColorSpace from the store', function () {
-      expect(color_spaces.store).to.not.contain(rgb)
-      expect(color_spaces.store).to.contain(xyz)
-      expect(color_spaces.store).to.contain(hsl)
+      color_spaces.remove('rgb')
+
+      expect(color_spaces.store.rgb).to.be.undefined
+      expect(color_spaces.store.xyz).to.eq(xyz)
+      expect(color_spaces.store.hsl).to.eq(hsl)
     })
   })
 
-  describe('findIndex', function () {
-    before(function () {
-      color_spaces = ColorSpaceStore.create()
-      color_spaces.add(rgb)
-      color_spaces.add(xyz)
-      color_spaces.add(hsl)
-    })
-    it('returns the index of a ColorSpace if it exists', function () {
-      expect(color_spaces.findIndex('rgb')).to.eq(0)
-      expect(color_spaces.findIndex('xyz')).to.eq(1)
-      expect(color_spaces.findIndex('hsl')).to.eq(2)
-    })
-    it('returns null if the ColorSpace doesn\'t exist', function () {
-      expect(color_spaces.findIndex('lab')).to.be.null
-    })
-  })
-
-  describe('find', function () {
+  describe('.find(space_name)', function () {
     before(function () {
       color_spaces = ColorSpaceStore.create()
       color_spaces.add(rgb)
@@ -67,7 +60,7 @@ describe('ColorSpaceStore', function () {
     })
   })
 
-  describe('has', function () {
+  describe('.has(space_name)', function () {
     before(function () {
       color_spaces = ColorSpaceStore.create()
       color_spaces.add(rgb)
@@ -82,57 +75,57 @@ describe('ColorSpaceStore', function () {
     })
   })
 
-  describe('merge', function () {
-    var store1, store2, noop, rgb1, rgb2, hsl, xyz;
+  describe('.merge(foreign_store)', function () {
+    var store1, store2, noop;
+
     beforeEach(function () {
       store1 = ColorSpaceStore.create()
       store2 = ColorSpaceStore.create()
-      rgb = ColorSpace.create('rgb')
-      hsl = ColorSpace.create('hsl')
       noop = function () {}
     })
     it('adds the space if it doesn\'t exist yet', function () {
-      rgb.defineConvTo('hsl', noop)
-      hsl.defineConvTo('rgb', noop)
+      var rgb = ColorSpace('rgb')
+      var hsl = ColorSpace('hsl')
+
       store1.add(rgb)
       store2.add(hsl)
       store1.merge(store2)
-      expect(store1.has('rgb')).to.be.true
-      expect(store1.has('hsl')).to.be.true
+      expect(store1.store.rgb).to.be.ok
+      expect(store1.store.hsl).to.be.ok
     })
     it('concrete spaces always win over abstract spaces', function () {
-      var abstract_rgb = ColorSpace.create('rgb', { abstract: true })
-      var concrete_rgb = ColorSpace.create('rgb')
-      var abstract_hsl = ColorSpace.create('hsl', { abstract: true })
-      var concrete_hsl = ColorSpace.create('hsl')
+      var abstract_rgb = ColorSpace('rgb', true)
+      var concrete_rgb = ColorSpace('rgb')
+      var abstract_hsl = ColorSpace('hsl', true)
+      var concrete_hsl = ColorSpace('hsl')
 
-      abstract_rgb.defineConvTo('hsl', function () { return 'abstract' })
-      concrete_rgb.defineConvTo('hsl', function () { return 'concrete' })
-      abstract_hsl.defineConvTo('rgb', function () { return 'abstract' })
-      concrete_hsl.defineConvTo('rgb', function () { return 'concrete' })
+      abstract_rgb.conversions.add('hsl', function () { return 'abstract' })
+      concrete_rgb.conversions.add('hsl', function () { return 'concrete' })
+      abstract_hsl.conversions.add('rgb', function () { return 'abstract' })
+      concrete_hsl.conversions.add('rgb', function () { return 'concrete' })
 
       store1.add(concrete_hsl)
-      store1.add(abstract_hsl)
-      store2.add(abstract_rgb)
+      store1.add(abstract_rgb)
+      store2.add(abstract_hsl)
       store2.add(concrete_rgb)
 
       store1.merge(store2)
 
-      expect(store1.find('rgb').to('hsl')()).to.be.eq('concrete')
-      expect(store1.find('hsl').to('rgb')()).to.be.eq('concrete')
+      expect(store1.find('rgb').conversions.find('hsl')()).to.be.eq('concrete')
+      expect(store1.find('hsl').conversions.find('rgb')()).to.be.eq('concrete')
     })
     it('uses the receiving space rather than the giving space if they\'re the same', function () {
-      var rgb1 = ColorSpace.create('rgb', { abstract: true })
-      var rgb2 = ColorSpace.create('rgb', { abstract: true })
-      var hsl1 = ColorSpace.create('hsl')
-      var hsl2 = ColorSpace.create('hsl')
+      var rgb1 = ColorSpace('rgb', true)
+      var rgb2 = ColorSpace('rgb', true)
+      var hsl1 = ColorSpace('hsl')
+      var hsl2 = ColorSpace('hsl')
 
-      rgb1.defineConvTo('hsl', function () { return 'original' })
-      rgb2.defineConvTo('hsl', function () { return 'foreign' })
-      rgb2.defineConvTo('xyz', function () { return 'foreign' })
-      hsl1.defineConvTo('rgb', function () { return 'original' })
-      hsl2.defineConvTo('rgb', function () { return 'foreign' })
-      hsl2.defineConvTo('hsb', function () { return 'foreign' })
+      rgb1.conversions.add('hsl', function () { return 'original' })
+      rgb2.conversions.add('hsl', function () { return 'foreign' })
+      rgb2.conversions.add('xyz', function () { return 'foreign' })
+      hsl1.conversions.add('rgb', function () { return 'original' })
+      hsl2.conversions.add('rgb', function () { return 'foreign' })
+      hsl2.conversions.add('hsb', function () { return 'foreign' })
 
       store1.add(hsl1)
       store1.add(rgb1)
@@ -141,24 +134,24 @@ describe('ColorSpaceStore', function () {
 
       store1.merge(store2)
 
-      expect(store1.find('rgb').to('hsl')()).to.be.eq('original')
-      expect(store1.find('hsl').to('rgb')()).to.be.eq('original')
-      expect(store1.find('hsl').to('hsb')()).to.be.eq('foreign')
-      expect(store1.find('rgb').to('xyz')()).to.be.eq('foreign')
+      expect(store1.find('rgb').conversions.find('hsl')()).to.be.eq('original')
+      expect(store1.find('hsl').conversions.find('rgb')()).to.be.eq('original')
+      expect(store1.find('hsl').conversions.find('hsb')()).to.be.eq('foreign')
+      expect(store1.find('rgb').conversions.find('xyz')()).to.be.eq('foreign')
     })
   })
-  describe('findNeighbors', function () {
+  describe('.findNeighbors(space_name)', function () {
     it('returns an array of neighboring color spaces', function () {
       var store = ColorSpaceStore.create()
-      var rgb = ColorSpace.create('rgb')
-      var luv = ColorSpace.create('luv')
-      var xyz = ColorSpace.create('xyz')
-      var lab = ColorSpace.create('lab', { abstract: true })
+      var rgb = ColorSpace('rgb')
+      var luv = ColorSpace('luv')
+      var xyz = ColorSpace('xyz')
+      var lab = ColorSpace('lab', true)
 
-      xyz.defineConvTo('rgb', function () {})
-      xyz.defineConvTo('lab', function () {})
-      xyz.defineConvTo('xyz', function () {})
-      xyz.defineConvTo('luv', function () {})
+      xyz.conversions.add('rgb', function () {})
+      xyz.conversions.add('lab', function () {})
+      xyz.conversions.add('xyz', function () {})
+      xyz.conversions.add('luv', function () {})
 
       store.add(rgb)
       store.add(luv)
@@ -170,8 +163,5 @@ describe('ColorSpaceStore', function () {
       expect(neighbors).to.contain('luv')
       expect(neighbors).to.contain('xyz')
     })
-  })
-  describe('purge', function () {
-    it('removes all mention of a color space')
   })
 })
