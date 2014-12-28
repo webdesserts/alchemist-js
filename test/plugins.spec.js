@@ -1,10 +1,10 @@
 var plugins = require('../lib/plugins')
-var ColorSpace = require('../lib/colorSpace')
 var ColorSpaceStore = require('../lib/colorSpaceStore')
+var Color = require('../lib/color')
 var expect = require('chai').expect
 
 describe('plugins', function () {
-  describe('type', function () {
+  describe('.type(plugin)', function () {
     it('returns "space" when it\'s a color space', function () {
       var rgb = { name: 'rgb', to: {}, from: {} }
       expect(plugins.type(rgb)).to.eq('space')
@@ -17,7 +17,7 @@ describe('plugins', function () {
       expect(plugins.type.bind(null, invalid)).to.throw(Error)
     })
   })
-  describe('serializeColorSpace', function () {
+  describe('.serializeColorSpace(plugin)', function () {
     var rgb, unnamed, broken;
 
     before(function () {
@@ -49,33 +49,33 @@ describe('plugins', function () {
     })
 
     it('returns a ColorSpaceStore', function () {
-      var color_spaces = plugins.serializeColorSpace(rgb)
+      var color_spaces = plugins.serializeColorSpace(rgb, Color)
 
       expect(ColorSpaceStore.isPrototypeOf(color_spaces)).to.be.true
     })
 
     it('has a set of derived color spaces in it\'s result set', function () {
-      var color_spaces = plugins.serializeColorSpace(rgb)
+      var color_spaces = plugins.serializeColorSpace(rgb, Color)
 
       expect(color_spaces.has('xyz')).to.be.true
-      expect(color_spaces.find('xyz').isAbstract).to.be.true
+      expect(color_spaces.find('xyz').is_concrete).to.be.false
 
       expect(color_spaces.has('hsl')).to.be.true
-      expect(color_spaces.find('hsl').isAbstract).to.be.true
+      expect(color_spaces.find('hsl').is_concrete).to.be.false
 
       expect(color_spaces.has('rgb')).to.be.true
-      expect(ColorSpace.isPrototypeOf(color_spaces.find('rgb'))).to.be.true
+      expect(Color.isPrototypeOf(color_spaces.find('rgb'))).to.be.true
     })
 
     it('throws an error if the plugin is missing a name', function () {
       expect(function () {
-        var abstract_space = plugins.serializeColorSpace(unnamed)
+        var abstract_space = plugins.serializeColorSpace(unnamed, Color)
       }).to.throw(Error)
     })
 
     it('throws an error if a conversion is not a function', function () {
       expect(function () {
-        var abstract_space = plugins.serializeColorSpace(broken)
+        var abstract_space = plugins.serializeColorSpace(broken, Color)
       }).to.throw(Error)
     })
   })

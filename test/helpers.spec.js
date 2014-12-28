@@ -123,6 +123,29 @@ describe('helpers', function () {
     })
   })
 
+  describe('.isPlainObject(obj)', function () {
+    it('returns true if <obj> is an object', function () {
+      expect(helpers.isPlainObject({ a: 1, b: 2, c: 3 })).to.be.true
+      expect(helpers.isPlainObject({})).to.be.true
+    })
+    it('returns false if <obj> is an instantiated Object', function () {
+      var Shape = function () {}
+      expect(helpers.isPlainObject(new Shape)).to.be.false
+    })
+    it('returns false if <obj> is null or undefined', function () {
+      expect(helpers.isPlainObject(null)).to.be.false
+      expect(helpers.isPlainObject(undefined)).to.be.false
+    })
+    it('returns false if <obj> is an array', function () {
+      expect(helpers.isPlainObject(['totally', 'an', 'object'])).to.be.false
+    })
+    it('returns false if <obj> other things', function () {
+      expect(helpers.isPlainObject('an object, I swear')).to.be.false
+      expect(helpers.isPlainObject(1)).to.be.false
+      expect(helpers.isPlainObject(0)).to.be.false
+    })
+  })
+
   describe('.Createable', function () {
     var Obj;
     before(function () {

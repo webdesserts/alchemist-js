@@ -33,7 +33,7 @@ describe('Alchemist', function () {
     alchemist.use(rgb)
   })
 
-  describe('use', function () {
+  describe('.use(plugin)', function () {
     describe('when given a color space plugin', function () {
       it('creates a method on alchemist associated to that color space', function () {
         expect(alchemist.rgb).to.be.a('function')
@@ -46,7 +46,7 @@ describe('Alchemist', function () {
     })
   })
 
-  describe('[color space]', function () {
+  describe('.[color space](values)', function () {
     it('returns a color', function () {
       var color = alchemist.rgb([255, 255, 255])
       expect(Color.isPrototypeOf(color)).to.be.true
@@ -70,7 +70,7 @@ describe('Alchemist', function () {
     })
   })
 
-  describe('[color space][conversion]', function () {
+  describe('[color space].[conversion]()', function () {
     it('creates a conversion to that color', function () {
       var color = alchemist.rgb('rgb')
       var result = color.xyz()
