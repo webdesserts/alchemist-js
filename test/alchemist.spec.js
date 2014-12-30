@@ -77,4 +77,49 @@ describe('Alchemist', function () {
       expect(result).to.eq('rgb xyz')
     })
   })
+
+  describe.only('[color space].[color method]()', function () {
+    it('is just a normal method', function () {
+      alchemist.init({ precision: 2 })
+      alchemist.use(alchemist.common())
+      alchemist.use({
+        name: 'lighten',
+        methods: {
+          color: function (amount) {
+            var lab = this.as('lab')
+            lab.value[0] += amount
+            return lab
+          }
+        }
+      })
+      expect(alchemist.rgb(150, 150, 160).lighten(5).rgb()).to.deep.equal([164.45, 162.52, 173.45])
+    })
+  })
+  describe.only('.[global method]()', function () {
+    it('is just a normal method', function () {
+      alchemist.init()
+      alchemist.use(alchemist.common())
+      alchemist.use({
+        name: 'lightest',
+        methods: {
+          global: function () {
+            var lightest = arguments[0].as('lab')
+            var lightness = 0
+            var len = arguments.length
+            for (var i = 1; i < len; i++) {
+              var current = arguments[i].as('lab')
+              lightness = current.value[0]
+              if (lightness > lightest.value[0]) lightest = current;
+            }
+            return lightest
+          }
+        }
+      })
+      var red = alchemist.rgb(72, 56, 57)
+      var green = alchemist.rgb(52, 76, 57)
+      var blue = alchemist.rgb(52, 56, 77)
+      var result = alchemist.lightest(red, green, blue)
+      expect(result.as('rgb').value).to.deep.equal([52.0638, 75.9548, 57.0371])
+    })
+  })
 })
