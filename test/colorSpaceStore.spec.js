@@ -1,3 +1,5 @@
+'use strict'
+
 var Color = require('../lib/color')
 var ColorSpaceStore = require('../lib/colorSpaceStore')
 var ConversionStore = require('../lib/conversionStore')

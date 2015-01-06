@@ -1,3 +1,5 @@
+'use strict'
+
 var plugins = require('../lib/plugins')
 var ColorSpaceStore = require('../lib/colorSpaceStore')
 var Color = require('../lib/color')

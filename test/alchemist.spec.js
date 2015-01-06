@@ -1,3 +1,5 @@
+'use strict'
+
 var Alchemist = require('../')
 var Color = require('../lib/color')
 var expect = require('chai').expect

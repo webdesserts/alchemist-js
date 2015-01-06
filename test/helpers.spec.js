@@ -1,3 +1,5 @@
+'use strict'
+
 var helpers = require('../lib/helpers')
 var expect = require('chai').expect
 

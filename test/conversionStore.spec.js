@@ -1,3 +1,5 @@
+'use strict'
+
 var ConversionStore = require('../lib/conversionStore')
 var expect = require('chai').expect
 

@@ -1,3 +1,5 @@
+'use strict'
+
 var Storage = require('../lib/storage')
 var expect = require('chai').expect
 

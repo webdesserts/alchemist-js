@@ -1,3 +1,5 @@
+'use strict'
+
 var Color = require('../lib/color')
 var expect = require('chai').expect
 

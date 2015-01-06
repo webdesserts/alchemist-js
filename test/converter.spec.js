@@ -1,4 +1,4 @@
-'strict mode'
+'use strict'
 
 var Color = require('../lib/color')
 var Converter = require('../lib/converter')

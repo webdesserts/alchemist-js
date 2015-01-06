@@ -1,3 +1,5 @@
+'use strict'
+
 var gulp = require('gulp')
 var g = require('gulp-load-plugins')()
 var series = require('run-sequence')

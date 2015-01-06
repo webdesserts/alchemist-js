@@ -1,3 +1,5 @@
+'use strict'
+
 var Alchemist = require('./lib/alchemist');
 
 var common = function common () {
