@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "no-unused-vars": [1, { "args": "none" }],
+
+    // disabling defaults
+    "no-trailing-spaces": 0,
+    "no-use-before-define": 0,
+    "quotes": 0,
+    "semi": 0,
+    "camelcase": 0,
+    "key-spacing": 0,
+    "curly": 0,
+    "new-cap": 0
+  }
+}
