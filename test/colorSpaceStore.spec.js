@@ -11,7 +11,7 @@ describe('ColorSpaceStore', function () {
   before(function () {
     ColorSpace = function ColorSpace (name, abstract) {
       return Color.create({
-        type: name,
+        space: name,
         abstract: abstract,
         conversions: ConversionStore.create()
       })

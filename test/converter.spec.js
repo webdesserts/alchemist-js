@@ -68,7 +68,7 @@ describe('Converter', function () {
 
   describe('.convert(color, target_name)', function () {
     describe('when the target color space is adjacet', function () {
-      it('just converts the color', function () {
+      it('converts the color', function () {
         var color = color_spaces.find('rgb').create('rgb')
         var new_color = converter.convert(color, 'xyz')
         expect(new_color.value).to.eq('rgb xyz')
@@ -116,7 +116,7 @@ describe('Converter', function () {
       color.conversions.add('myrgb', function (r, g, b) {
         expect(this).to.eq(color)
         expect(this.value).to.deep.eq([255, 255, 255])
-        expect(this.type).to.eq('rgb')
+        expect(this.space).to.eq('rgb')
       })
       converter.applyConversion(color, 'myrgb')
     })
