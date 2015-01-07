@@ -80,6 +80,27 @@ describe('Converter', function () {
         var new_color = converter.convert(color, 'lab')
         expect(new_color.value).to.eq('rgb xyz lab')
       })
+      it('safely passes null through', function () {
+        var color_spaces = ColorSpaceStore.create()
+
+        color_spaces.merge(plugins.serializeColorSpace({
+          name: 'rgb',
+          to: { 'xyz': function (r, g, b) { return null } }
+        }, Color))
+        color_spaces.merge(plugins.serializeColorSpace({
+          name: 'xyz',
+          to: { 'lab': function (x, y, z) { return [x, y, z] } }
+        }, Color))
+        color_spaces.merge(plugins.serializeColorSpace({
+          name: 'lab', to: { }
+        }, Color))
+
+        var converter = Converter.create(color_spaces)
+
+        var color = color_spaces.find('rgb').create([265, 255, 180])
+        var new_color = converter.convert(color, 'lab')
+        expect(new_color.value).to.eq(null)
+      })
     })
   })
 

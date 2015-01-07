@@ -28,10 +28,11 @@ describe('plugins', function () {
     })
   })
   describe('.serializeColorSpace(plugin)', function () {
-    var rgb, unnamed, broken;
     var rgb, unnamed, broken, BaseSpace;
 
     before(function () {
+      BaseSpace = Color.create()
+      BaseSpace.limits = { handler: 'nullify' }
       rgb = {
         name: 'rgb',
         to: {
@@ -60,13 +61,13 @@ describe('plugins', function () {
     })
 
     it('returns a ColorSpaceStore', function () {
-      var color_spaces = plugins.serializeColorSpace(rgb, Color)
+      var color_spaces = plugins.serializeColorSpace(rgb, BaseSpace)
 
       expect(ColorSpaceStore.isPrototypeOf(color_spaces)).to.be.true
     })
 
     it('has a set of derived color spaces in it\'s result set', function () {
-      var color_spaces = plugins.serializeColorSpace(rgb, Color)
+      var color_spaces = plugins.serializeColorSpace(rgb, BaseSpace)
 
       expect(color_spaces.has('xyz')).to.be.true
       expect(color_spaces.find('xyz').is_concrete).to.be.false
@@ -80,13 +81,13 @@ describe('plugins', function () {
 
     it('throws an error if the plugin is missing a name', function () {
       expect(function () {
-        var abstract_space = plugins.serializeColorSpace(unnamed, Color)
+        plugins.serializeColorSpace(unnamed, BaseSpace)
       }).to.throw(Error)
     })
 
     it('throws an error if a conversion is not a function', function () {
       expect(function () {
-        var abstract_space = plugins.serializeColorSpace(broken, Color)
+        plugins.serializeColorSpace(broken, BaseSpace)
       }).to.throw(Error)
     })
   })

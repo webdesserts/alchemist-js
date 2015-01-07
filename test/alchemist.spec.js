@@ -124,4 +124,61 @@ describe('Alchemist', function () {
       expect(result.as('rgb').value).to.deep.equal([52.0638, 75.9548, 57.0371])
     })
   })
+
+  describe('limits', function () {
+    var rgb;
+    before(function () {
+      rgb = {
+        name: 'rgb',
+        limits: {
+          max: [255, 255, 255],
+          min: [0, 0, 0]
+        },
+        to: {}
+      }
+    })
+    describe('when set to "nullify"', function () {
+      before(function () {
+        alchemist.init({ limits: 'nullify' })
+        alchemist.use(rgb)
+      })
+      it('returns null if the color is out of bounds', function () {
+        var overboard = alchemist.rgb(267, 80, -20)
+        expect(overboard.value).to.eq(null)
+      })
+      it('returns the color when in bounds', function () {
+        var inbounds = alchemist.rgb(255, 150, 0)
+        expect(inbounds.value).to.deep.eq([255, 150, 0])
+      })
+    })
+    describe('when set to "clip"', function () {
+      before(function () {
+        alchemist.init({ limits: 'clip' })
+        alchemist.use(rgb)
+      })
+      it('returns the limit if the color is out of bounds', function () {
+        var overboard = alchemist.rgb(267, 80, -20)
+        expect(overboard.value).to.deep.eq([255, 80, 0])
+      })
+      it('returns the color when in bounds', function () {
+        var inbounds = alchemist.rgb(255, 150, 0)
+        expect(inbounds.value).to.deep.eq([255, 150, 0])
+      })
+    })
+    describe('when set to "error"', function () {
+      before(function () {
+        alchemist.init({ limits: 'error' })
+        alchemist.use(rgb)
+      })
+      it('throws an error when the color is out of bounds', function () {
+        expect(function () {
+          alchemist.rgb(267, 80, -20)
+        }).to.throw(Error, 'Expected -20 to be greater than or equal to 0')
+      })
+      it('returns the color when in bounds', function () {
+        var inbounds = alchemist.rgb(255, 150, 0)
+        expect(inbounds.value).to.deep.eq([255, 150, 0])
+      })
+    })
+  })
 })
