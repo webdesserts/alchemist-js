@@ -67,6 +67,13 @@ describe('Converter', function () {
   })
 
   describe('.convert(color, target_name)', function () {
+    describe('when the current space is the target color space', function () {
+      it('just returns the color', function () {
+        var color = color_spaces.find('rgb').create('stuff')
+        var not_so_new_color = converter.convert(color, 'rgb')
+        expect(not_so_new_color.space).to.eq('rgb')
+      })
+    })
     describe('when the target color space is adjacet', function () {
       it('converts the color', function () {
         var color = color_spaces.find('rgb').create('rgb')
