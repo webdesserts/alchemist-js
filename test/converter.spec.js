@@ -1,6 +1,7 @@
 'use strict'
 
 var Color = require('../lib/color')
+var plugins = require('../lib/plugins')
 var Converter = require('../lib/converter')
 var ColorSpaceStore = require('../lib/colorSpaceStore')
 var expect = require('chai').expect
@@ -11,7 +12,7 @@ describe('Converter', function () {
   beforeEach(function () {
     color_spaces = ColorSpaceStore.create()
 
-    tracePath = function (space) {
+    var tracePath = function (space) {
       return function (path) {
         return [path, space].join(' ')
       }

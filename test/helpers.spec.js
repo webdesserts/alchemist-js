@@ -75,7 +75,8 @@ describe('helpers', function () {
       var my_context = {}
 
       helpers.each(array, function (val, i) {
-        return that = this
+        that = this
+        return
       }, my_context)
 
       expect(that).to.eq(my_context)
@@ -104,7 +105,7 @@ describe('helpers', function () {
       expect(cloned).to.not.deep.eq(obj1.val)
     })
     it('throws an error if it\'s anything else', function () {
-      obj = { val: 'hello', val2: 'world' }
+      var obj = { val: 'hello', val2: 'world' }
       expect(helpers.clone.bind(obj)).to.throw(TypeError)
     })
   })
@@ -132,7 +133,7 @@ describe('helpers', function () {
     })
     it('returns false if <obj> is an instantiated Object', function () {
       var Shape = function () {}
-      expect(helpers.isPlainObject(new Shape)).to.be.false
+      expect(helpers.isPlainObject(new Shape())).to.be.false
     })
     it('returns false if <obj> is null or undefined', function () {
       expect(helpers.isPlainObject(null)).to.be.false

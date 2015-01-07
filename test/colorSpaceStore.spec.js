@@ -78,12 +78,11 @@ describe('ColorSpaceStore', function () {
   })
 
   describe('.merge(foreign_store)', function () {
-    var store1, store2, noop;
+    var store1, store2;
 
     beforeEach(function () {
       store1 = ColorSpaceStore.create()
       store2 = ColorSpaceStore.create()
-      noop = function () {}
     })
     it('adds the space if it doesn\'t exist yet', function () {
       var rgb = ColorSpace('rgb')

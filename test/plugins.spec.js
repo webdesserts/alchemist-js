@@ -29,6 +29,7 @@ describe('plugins', function () {
   })
   describe('.serializeColorSpace(plugin)', function () {
     var rgb, unnamed, broken;
+    var rgb, unnamed, broken, BaseSpace;
 
     before(function () {
       rgb = {

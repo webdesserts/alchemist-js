@@ -42,7 +42,7 @@ describe('Alchemist', function () {
       })
 
       it('throws an error when the name is already used by a private method', function () {
-        plugin = { name: 'use', to: {} }
+        var plugin = { name: 'use', to: {} }
         expect(alchemist.use.bind(null, plugin)).to.throw(Error)
       })
     })
@@ -80,7 +80,7 @@ describe('Alchemist', function () {
     })
   })
 
-  describe.only('[color space].[color method]()', function () {
+  describe('[color space].[color method]()', function () {
     it('is just a normal method', function () {
       alchemist.init({ precision: 2 })
       alchemist.use(alchemist.common())
@@ -97,7 +97,7 @@ describe('Alchemist', function () {
       expect(alchemist.rgb(150, 150, 160).lighten(5).rgb()).to.deep.equal([164.45, 162.52, 173.45])
     })
   })
-  describe.only('.[global method]()', function () {
+  describe('.[global method]()', function () {
     it('is just a normal method', function () {
       alchemist.init()
       alchemist.use(alchemist.common())

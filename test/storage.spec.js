@@ -34,7 +34,7 @@ describe('Storage', function () {
       expect(storage.find('a')).to.eq(a)
     })
     it('returns null if <key> is not yet set', function () {
-      expect(storage.find('b')).to.null
+      expect(storage.find('b')).to.be.null
     })
   })
 
@@ -92,7 +92,8 @@ describe('Storage', function () {
       var my_context = {}
 
       storage.each(function (key, value) {
-        return that = this
+        that = this
+        return
       }, my_context)
 
       expect(that).to.eq(my_context)

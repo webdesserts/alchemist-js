@@ -95,7 +95,8 @@ describe('ConversionStore', function () {
       var my_context = {}
 
       conversions.each(function () {
-        return that = this
+        that = this
+        return
       }, my_context)
 
       expect(that).to.eq(my_context)
