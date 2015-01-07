@@ -165,9 +165,9 @@ describe('Alchemist', function () {
         expect(inbounds.value).to.deep.eq([255, 150, 0])
       })
     })
-    describe('when set to "error"', function () {
+    describe('when set to "strict"', function () {
       before(function () {
-        alchemist.init({ limits: 'error' })
+        alchemist.init({ limits: 'strict' })
         alchemist.use(rgb)
       })
       it('throws an error when the color is out of bounds', function () {
