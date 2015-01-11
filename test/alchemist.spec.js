@@ -143,7 +143,7 @@ describe('Alchemist', function () {
         alchemist.use(rgb)
       })
       it('returns null if the color is out of bounds', function () {
-        var overboard = alchemist.rgb(267, 80, -20)
+        var overboard = alchemist.rgb(267, -20, 80)
         expect(overboard.value).to.eq(null)
       })
       it('returns the color when in bounds', function () {
@@ -157,8 +157,8 @@ describe('Alchemist', function () {
         alchemist.use(rgb)
       })
       it('returns the limit if the color is out of bounds', function () {
-        var overboard = alchemist.rgb(267, 80, -20)
-        expect(overboard.value).to.deep.eq([255, 80, 0])
+        var overboard = alchemist.rgb(267, -20, 80)
+        expect(overboard.value).to.deep.eq([255, 0, 80])
       })
       it('returns the color when in bounds', function () {
         var inbounds = alchemist.rgb(255, 150, 0)
@@ -172,7 +172,7 @@ describe('Alchemist', function () {
       })
       it('throws an error when the color is out of bounds', function () {
         expect(function () {
-          alchemist.rgb(267, 80, -20)
+          alchemist.rgb(267, -20, 80)
         }).to.throw(Error, 'Expected -20 to be greater than or equal to 0')
       })
       it('returns the color when in bounds', function () {
