@@ -8,11 +8,11 @@ describe('helpers', function () {
     describe('when given a number', function () {
       it('rounds the number', function () {
         var rounded = helpers.round(6.6666666)
-        expect(rounded).to.eq(6.6667)
+        expect(rounded).to.eq(6.667)
       })
       it('rounds to a specific decimal place if a precision is provided', function () {
         var rounded = helpers.round(6.6666666, 2)
-        expect(rounded).to.eq(6.67)
+        expect(rounded).to.eq(6.7)
       })
     })
     describe('when given something else', function () {
@@ -25,7 +25,7 @@ describe('helpers', function () {
       it('attempts to round its contents', function () {
         var array = [6.66666, 'bla', 8.88888]
         var rounded = helpers.round(array)
-        expect(rounded).to.deep.eq([6.6667, 'bla', 8.8889])
+        expect(rounded).to.deep.eq([6.667, 'bla', 8.889])
       })
     })
   })

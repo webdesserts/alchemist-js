@@ -30,7 +30,7 @@ describe('Alchemist', function () {
       }
     }
 
-    alchemist = Alchemist.create()
+    alchemist = Alchemist.create({ precision: 4 })
     alchemist.use(xyz)
     alchemist.use(rgb)
   })
@@ -94,12 +94,12 @@ describe('Alchemist', function () {
           }
         }
       })
-      expect(alchemist.rgb(150, 150, 160).lighten(5).rgb()).to.deep.equal([164.45, 162.52, 173.45])
+      expect(alchemist.rgb(150, 150, 160).lighten(5).rgb()).to.deep.equal([160, 160, 170])
     })
   })
   describe('.[global method]()', function () {
     it('is just a normal method', function () {
-      alchemist.init()
+      alchemist.init({ precision: 2 })
       alchemist.use(alchemist.common())
       alchemist.use({
         name: 'lightest',
@@ -121,7 +121,7 @@ describe('Alchemist', function () {
       var green = alchemist.rgb(52, 76, 57)
       var blue = alchemist.rgb(52, 56, 77)
       var result = alchemist.lightest(red, green, blue)
-      expect(result.as('rgb').value).to.deep.equal([52.0638, 75.9548, 57.0371])
+      expect(result.rgb()).to.deep.equal([52, 76, 57])
     })
   })
 

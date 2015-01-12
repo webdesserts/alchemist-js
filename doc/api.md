@@ -76,8 +76,8 @@ alchemist.use(alchemist.common())
 clippy.use(clippy.common())
 bossy.use(strict_mode.common())
 
-alchemist.rgb(265, 70 -20).value // => null
-clippy.rgb(265, 70, -20).value // [255, 75, 0]
+alchemist.rgb(265, 70 -20).value //=> null
+clippy.rgb(265, 70, -20).value //=> [255, 75, 0]
 bossy.rgb(265, 70, -20) // Error: Expected 265 to be less than 255
 ```
 
@@ -92,7 +92,7 @@ The value for the current color. In most cases this will be an array of numbers 
 
 ```javascript
 var white = alchemist.rgb(255, 255, 255)
-white.value // => [255, 255, 255]
+white.value //=> [255, 255, 255]
 ```
 
 ### `Color.space`
@@ -101,25 +101,30 @@ The color space of the color
 
 ```javascript
 var black = alchlemist.rgb(0, 0, 0)
-black.space // => 'rgb'
+black.space //=> 'rgb'
 ```
 
-### `Color.to(target_space)`
+### `Color.to(target_space[, options])`
 
 This function will attempt to convert to the the `target_space` and return the resulting color's value. If a path cannot be found or the `target_space` does not exist, it will throw an Error. 
 
+#### `options.precision`
+How precise the rounded value will be. Pass `null` to receive the raw value.
+
+
+
 ```javascript
 var color = alchemist.rgb(150, 70, 180)
-color.to('hsl') // => [283, 0.44, 0.49]
+color.to('hsl') //=> [283, 0.44, 0.49]
 color.to('unknown') // Error: Could not find 'unknown' color space
 ```
 
-### `Color[target_space]()`
+### `Color[target_space]([options])`
 
-All plugins will have a color method named after their color space that serve as a shorcut to the `color.to()` variant. For example: If you use the `alchemist-hsl` plugin, your colors will now have a `color.hsl()` method to convert that color to hsl.
+All plugins will have a color method named after their color space that serve as a shorcut to the `color.to()` variant. For example: If you use the `alchemist-hsl` plugin, your colors will now have a `color.hsl([options])` method that is essentially to color.to('hsl'[, options]).
 
 ```javascript
-alchemist.rgb(150, 70, 180).hsl() // => [283, 0.44, 0.49]
+alchemist.rgb(150, 70, 180).hsl() //=> [283, 0.44, 0.49]
 ```
 
 ### `Color.as(target_space)`
@@ -129,6 +134,26 @@ Does the same `Color.to()`, but will return the resulting `Color` rather than it
 ```javascript
 var color = alchemist.rgb(150, 70, 180)
 new_color = color.as('hsl')
-new_color.space // 'hsl'
-new_color.value // => [283, 0.44, 0.49]
+new_color.space //=> 'hsl'
+new_color.value //=> [283, 0.44, 0.49]
+```
+
+### `Color.round([precision])`
+
+Returns the rounded value of the color. If the precision option was passed via `alchemist.create()`, alchemist will use that precision to round, otherwise, it defaults to a precision of 9. You can override this value by passing the desired precision directly to `round()`.
+
+#### Default Behavior
+```javascript
+grey = alchemist.rgb(150, 150, 150)
+grey.value //=> [ 0.2898812924040048, 0.3049873445686177, 0.33207933717871424 ]
+grey.round() //=> [ 0.289881292, 0.304987345, 0.332079337 ]
+grey.round(3) //=> [ 0.290, 0.305, 0.332 ]
+```
+
+#### Precision Option
+```javascript
+var alchemist = require('alchemist').create({ precision: 5 })
+
+grey = alchemist.rgb(150, 150, 150)
+grey.round() //=> [ 0.28988, 0.30499, 0.33208 ]
 ```
