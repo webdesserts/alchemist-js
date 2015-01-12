@@ -48,7 +48,7 @@ function rgb2husl(rgb) {
 Whew! That's not exactly consice now is it? Well unfortunately you find code very
 similar to this in almost every color library in use today. These hard-coded
 conversion paths prevent color libraries from becoming truly modular and force
-color spaces like HuSL to practically [implement their own color libraries][HuSL libraries].
+color spaces like HuSL to practically [implement their own color libraries][HuSL libraries] (although to be honest, boronine was probably perfectly content creating [another color library](https://github.com/boronine/colorspaces.js)).
 
 [HuSL libraries]: https://github.com/boronine/husl/blob/aa2afb58ccb829c8f9f3c679b96c25bfacb4552b/husl.js#L386-L400
 
@@ -83,4 +83,3 @@ XYZ - RGB - HSB
 When you go to convert between two color spaces, Alchemist will search the tree,
 figure out the quickest convertion path to that color space, and memorize it for
 the next time you need it.
-
