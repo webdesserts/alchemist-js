@@ -148,41 +148,4 @@ describe('helpers', function () {
       expect(helpers.isPlainObject(0)).to.be.false
     })
   })
-
-  describe('.Createable', function () {
-    var Obj;
-    before(function () {
-      Obj = Object.create(helpers.Createable)
-    })
-    describe('.create([params...])', function () {
-      it('calls Object.create on itself and returns the result', function () {
-        var new_obj = Obj.create()
-        expect(Obj.isPrototypeOf(new_obj)).to.be.true
-      })
-
-      it('will call that object\'s init() on the result if available', function () {
-        Obj.init = function () { this.message = 'hello world' }
-        var new_obj = Obj.create()
-        expect(new_obj.message).to.eq('hello world')
-        expect(Obj.message).to.be.undefined
-      })
-
-      it('will pass any arguments to the init() function', function () {
-        Obj.init = function (message) { this.message = message }
-        var new_obj = Obj.create('hello world')
-        expect(new_obj.message).to.eq('hello world')
-        expect(Obj.message).to.be.undefined
-      })
-    })
-    describe('.proto', function () {
-      it('references the prototype of this object', function () {
-        expect(Obj.proto).to.eq(helpers.Createable)
-      })
-      it('cannot be set', function () {
-        expect(function () {
-          Obj.proto = {}
-        }).to.throw(Error)
-      })
-    })
-  })
 })
