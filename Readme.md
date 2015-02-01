@@ -32,7 +32,6 @@ Documentation
 What's in the Pipeline?
 -----------------------
 
-- **Pluggable Color Modifiers** (e.g. color.lighten(.5))
 - **Alpha Transparency**
 - **Bounds & Optional Clipping**: color-space developers easily define the
   limits to your color spaces and users decide what should happen when they're
