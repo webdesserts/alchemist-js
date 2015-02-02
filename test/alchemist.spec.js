@@ -46,6 +46,15 @@ describe('Alchemist', function () {
         expect(alchemist.use.bind(null, plugin)).to.throw(Error)
       })
     })
+    describe('when given a function', function () {
+      it('calls it with alchemist as an argument and then uses the returned value as a plugin', function () {
+        var plugin = function (context) {
+          expect(context).to.eq(alchemist)
+          return { name: 'lab', to: {} }
+        }
+        alchemist.use(plugin)
+      })
+    })
   })
 
   describe('.[color space](values)', function () {

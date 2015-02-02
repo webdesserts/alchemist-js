@@ -1,6 +1,8 @@
 Plugins
 =======
 
+### Color Spaces
+
 Color Space Plugins are dead simple (for now). Here's the XYZ plugin in it's entirty.
 This also happens to be the bare minimum needed to have a valid color space plugin.
 
@@ -71,16 +73,45 @@ Again, we can define our own conversion.
 alchemist.rgb(255, 255, 255).myrgb() // [1, 1, 1]
 ```
 
-And that's pretty much all there is to plugins. If you ever need to know things
-like "what reference white are we using?" you can find more information on the
-`color` object provided.
+If you ever need to know things like "what reference white are we using?" you
+can pass `.use()` a function that returns your plugin instead. This will expose
+Alchemist and all of it's properties as the first argument of the passed function.
 
 ```js
-//...
-to: {
-  'rgb': function (R, G, B, color) {
-    color.white //=> { X: 0.95047, Y: 1, Z: 1.08883 }
+alchemist.use(function (alchemist) {
+  alchemist.white //=> { X: 0.9505, Y: 1, Z: 1.089}
+
+  return {
+    name: 'rgb',
+    to: {
+      //...
+    }
   }
-}
-//...
+})
+```
+
+### Color Methods
+
+Color Methods are a recent addition to alchemist plugins. More documentation is
+coming later, but to get you started, here is an example method. This method will
+set the lighteness of a color when used as a method of that color
+(e.g. `color.lightness(50)`), and will measure the lightness when used as a
+global (e.g. `alchemist.lightness(color)`)
+
+```js
+alchemist.use({
+  name: 'lightness',
+  methods: {
+    // is attached to each color
+    color: function (amount) {
+      var lab = color.as('lab')
+      lab[0] = amount
+      return lab
+    },
+    // is attached to alchemist itself
+    global: function (color) {
+      return color.as('lab')[0]
+    }
+  }
+})
 ```

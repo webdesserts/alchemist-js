@@ -1,8 +1,8 @@
 {
   "name": "alchemist-js",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "An extensible color library",
-  "main": "index.js",
+  "main": "alchemist.js",
   "scripts": {
     "test": "gulp test --silent",
     "dev": "gulp dev --silent",

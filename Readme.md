@@ -1,3 +1,5 @@
+![alchemist logo](https://www.dropbox.com/s/pwa86wj888a0ipv/alchemist.svg?dl=1)
+
 Alchemist.js
 ============
 The extensible color library.
@@ -5,20 +7,19 @@ The extensible color library.
 ```js
 var alchemist = require('alchemist-js')
 
-var rgb = require('alchemist-rgb')
-var hsl = require('alchemist-hsl')
-
-alchemist.use(rgb())
-alchemist.use(hsl())
-
 alchemist.rgb(150, 100, 50).hsl() // => [ 30, 0.5, 0.39 ]
-```
 
-**WARNING**: Alchemist.js is *Beta* level software. Until it reaches v1.0 expect
-things to break rather regularly. I'll try to keep these breaks to a minimum,
-but they will happen. If for some awful reason you decide to use this library
-in production, tie it down to a specific version. Please file an issue if you
-run into any problems. Thanks!
+alchemist.use({
+  name: 'lsh',
+  to: {
+    'hsl': function (L, S, H) {
+      return [H, S, L]
+    }
+  }
+})
+
+alchemist.lsh(.75, .5, 180).hsl() // => [180, .5, .75]
+```
 
 Documentation
 -------------
@@ -32,14 +33,11 @@ Documentation
 What's in the Pipeline?
 -----------------------
 
-- **Pluggable Color Modifiers** (e.g. color.lighten(.5))
 - **Alpha Transparency**
-- **Bounds & Optional Clipping**: color-space developers easily define the
-  limits to your color spaces and users decide what should happen when they're
-  reached (clip to the nearest color? return null?).
 - **More color spaces!** (HuSL anyone?)
+- **Color Modifiers** are ready! `alchemist-common` will be adding some soon.
 
-Want to help Alchemist reach v1.0 a bit faster? Send a pull request!
+Want to help Alchemist reach v2.0 a bit faster? Send a pull request!
 
 Special Thanks
 --------------
