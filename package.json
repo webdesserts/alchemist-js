@@ -32,7 +32,7 @@
     "run-sequence": "^1.0.1"
   },
   "dependencies": {
-    "alchemist-common": "^0.1.1",
+    "alchemist-common": "^1.0.0",
     "stateless": "^1.0.0"
   },
   "directories": {
