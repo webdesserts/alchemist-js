@@ -1,3 +1,26 @@
+2.0.0 / 2015-9-6
+================
+
+  This was mostly an internal update to improve the development environment of
+  alchemist. This will hopefully make future feature development much easier for
+  both alchemist and it's plugins. There were however, enough changes to the
+  project in general that I felt it deserved a major version bump.
+
+  * moved entire codebase (as well as the plugins) to es6
+  * renamed `alchemist.light` to `alchemist.lite` for berevity
+  * stopped tacking on the version number to the end of builds
+  * `dist/alchemist-node.js` will now be the entry point for node developers (at
+    least until node has es6 support)
+
+
+  * moved build system to the gulp 4 branch
+  * added a `gulp-summary` of all tasks
+  * improved build system all around
+  * All tests now runs all plugin's tests as well
+
+1.0.0 / ????-??-??
+=================
+**TODO** need to come back and clean this up
 
 0.3.0 / 2014-12-27
 ==================
