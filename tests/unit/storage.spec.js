@@ -1,7 +1,4 @@
-'use strict'
-
-var Storage = require('../lib/storage')
-var expect = require('chai').expect
+import Storage from '../../lib/storage'
 
 describe('Storage', function () {
   var storage, a, b, c;

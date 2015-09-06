@@ -1,10 +1,7 @@
-'use strict'
-
-var Color = require('../lib/color')
-var plugins = require('../lib/plugins')
-var Converter = require('../lib/converter')
-var ColorSpaceStore = require('../lib/colorSpaceStore')
-var expect = require('chai').expect
+import Color from '../../lib/color'
+import plugins from '../../lib/plugins'
+import Converter from '../../lib/converter'
+import ColorSpaceStore from '../../lib/colorSpaceStore'
 
 describe('Converter', function () {
   var color_spaces, converter;

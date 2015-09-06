@@ -1,13 +1,12 @@
-'use strict'
-var alchemist_common = require('alchemist-common')
+import alchemist_common from 'alchemist-common'
+import alchemist from './lib/index'
 
-var Alchemist = require('./lib/alchemist');
-Alchemist.use(alchemist_common)
+alchemist.use(alchemist_common)
 
 var common = function common () {
   return alchemist_common
 }
 
-Alchemist.common = Alchemist.common = common
+alchemist.common = common
 
-module.exports = Alchemist
+module.exports = alchemist

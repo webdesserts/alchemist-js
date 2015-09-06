@@ -1,9 +1,6 @@
-'use strict'
-
-var plugins = require('../lib/plugins')
-var ColorSpaceStore = require('../lib/colorSpaceStore')
-var Color = require('../lib/color')
-var expect = require('chai').expect
+import plugins from '../../lib/plugins'
+import ColorSpaceStore from '../../lib/colorSpaceStore'
+import Color from '../../lib/color'
 
 describe('plugins', function () {
   describe('.identify(plugin)', function () {

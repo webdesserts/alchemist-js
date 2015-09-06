@@ -1,9 +1,6 @@
-'use strict'
-
-var Color = require('../lib/color')
-var ColorSpaceStore = require('../lib/colorSpaceStore')
-var ConversionStore = require('../lib/conversionStore')
-var expect = require('chai').expect
+import Color from '../../lib/color'
+import ColorSpaceStore from '../../lib/colorSpaceStore'
+import ConversionStore from '../../lib/conversionStore'
 
 describe('ColorSpaceStore', function () {
   var color_spaces, rgb, xyz, hsl, ColorSpace;

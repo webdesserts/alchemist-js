@@ -1,116 +1,128 @@
-'use strict'
-
+require('./tasks/babel-setup')()
 var gulp = require('gulp')
-var g = require('gulp-load-plugins')()
-var series = require('run-sequence')
-var del = require('del')
+var config = require('./tasks/config')
+var Summary = require('gulp-summary')
 
-var package_config = require('./package.json')
-var EOL = require('os').EOL
+var summary = new Summary(gulp)
 
-var small_header = '// Alchemist.js v<%= version %> | license: <%= license %>' + EOL
-var large_header = [
-  '/**',
-  ' * Alchemist.js',
-  ' * v<%= version %>',
-  ' * License: <%= license %>',
-  ' *',
-  ' * Author: <%= author %>',
-  ' * Website: <%= homepage %>',
-  ' */',
-  EOL
-].join(EOL)
+summary.configure(config)
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']))
+/*======*\
+*  Main  *
+\*======*/
 
-gulp.task('build:min', function () {
-  return gulp.src(['dist/alchemist-*.js', '!dist/alchemist-*.min.js'])
-  .pipe(g.uglify())
-  .pipe(g.header(small_header, package_config))
-  .pipe(g.rename({ suffix: '.min' }))
-  .pipe(gulp.dest('dist'))
-  .pipe(g.size({ showFiles: true }))
-  .pipe(g.size({ showFiles: true, gzip: true }))
+summary.define({
+  command: 'default',
+  description: 'tests, lints, and then builds alchemist',
+  task: require('./tasks/default')
 })
 
-gulp.task('build:light', function () {
-  return gulp.src('alchemist.light.js')
-  .pipe(g.webpack({
-    output: {
-      filename: 'alchemist.js',
-      library: 'alchemist',
-      libraryTarget: 'umd',
-      sourcePrefix: '' } }))
-      .pipe(g.header(large_header, package_config))
-      .pipe(g.rename({ suffix: '-' + package_config.version + '.light'}))
-      .pipe(gulp.dest('dist'))
+summary.define({
+  command: 'dev',
+  description: 'watches all files and tests and lints as they change',
+  task: require('./tasks/dev')
 })
 
-gulp.task('build:main', function () {
-  return gulp.src('alchemist.js')
-  .pipe(g.webpack({
-    output: {
-      filename: 'alchemist.js',
-      library: 'alchemist',
-      libraryTarget: 'umd',
-      sourcePrefix: '' } }))
-      .pipe(g.header(large_header, package_config))
-      .pipe(g.rename({ suffix: '-' + package_config.version }))
-      .pipe(gulp.dest('dist'))
+summary.define({
+  command: 'build',
+  description: 'bundles all production builds of alchemist and places them in the dist/ directory',
+  task: require('./tasks/build')
 })
 
-gulp.task('build', function (cb) {
-  series('clean', 'build:main', 'build:light', 'build:min', cb)
+summary.define({
+  command: 'test',
+  description: 'runs tests for node',
+  task: require('./tasks/test/main')
 })
 
-gulp.task('test:run', function () {
-  return gulp.src('test/*.js')
-  .pipe(g.mocha({ reporter: 'spec' }))
-  .on('error', warn)
+summary.define({
+  command: 'lint',
+  description: 'lints alchemist, its tests, and all task files',
+  task: require('./tasks/lint/main')
 })
 
-gulp.task('test', function (cb) {
-  series('test:run', 'lint', cb)
+/*========*\
+*  Builds  *
+\*========*/
+
+summary.define({
+  command: 'build:tests',
+  description: 'bundles alchemist and its tests for testing in the browser',
+  task: require('./tasks/build/tests')
 })
 
-gulp.task('lint:src', function () {
-  return gulp.src(['lib/*.js', 'index.js'])
-  .pipe(g.eslint({ env: { node: true } }))
-  .pipe(g.jscs())
-  .on('error', warn)
-  .pipe(g.eslint.format())
+summary.define({
+  command: 'build:node',
+  description: 'transpiles and bundles all es6 code, but leaves the cjs requires',
+  task: require('./tasks/build/node')
 })
 
-gulp.task('lint:dev', function () {
-  return gulp.src(['gulpfile.js', 'test/*.js'])
-  .pipe(g.eslint({
-    rules: {
-      'no-unused-expressions': 0,
-      'no-shadow': 0
-    },
-    env: { mocha: true, node: true }
-  }))
-  .pipe(g.jscs())
-  .on('error', warn)
-  .pipe(g.eslint.format())
+summary.define({
+  command: 'build:browser',
+  description: 'bundles alchemist with alchemist-common and produces a development and minified build',
+  task: require('./tasks/build/browser')
 })
 
-gulp.task('lint', function (cb) {
-  series('lint:dev', 'lint:src', cb)
+summary.define({
+  command: 'build:lite',
+  description: 'bundles alchemist without alchemist-common and produces a development and minified build',
+  task: require('./tasks/build/lite')
 })
 
-gulp.task('watch:lint', ['lint'], function () {
-  gulp.watch(['gulpfile.js', '.eslintrc', 'test/*.js', 'lib/*.js', 'index.js'], ['lint'])
+summary.define({
+  command: 'build:size',
+  description: 'reports the size of all builds',
+  task: require('./tasks/build/size')
 })
 
-gulp.task('dev', ['test'], function () {
-  gulp.watch('test/*.js', ['test'])
-  gulp.watch('lib/*.js', ['test', 'lint'])
+/*=======*\
+*  Tests  *
+\*=======*/
+
+summary.define({
+  command: 'test:node',
+  description: 'runs tests with normal node requires and outputs to console',
+  task: require('./tasks/test/node')
 })
 
-gulp.task('default', ['build'])
+summary.define({
+  command: 'test:browser',
+  description: 'opens the runner.html in your default browser',
+  task: require('./tasks/test/browser')
+})
 
-function warn (err) {
-  console.warn(err.message)
-  this.emit('end')
-}
+summary.define({
+  command: 'test:watch',
+  description: 'watches the project and runs the node tests on change',
+  task: require('./tasks/test/watch')
+})
+
+/*=========*\
+*  Linting  *
+\*=========*/
+
+summary.define({
+  command: 'lint:lib',
+  description: 'lints alchemist',
+  task: require('./tasks/lint/lib')
+})
+
+summary.define({
+  command: 'lint:tests',
+  description: 'lints all of alchemist\'s tests',
+  task: require('./tasks/lint/tests')
+})
+
+summary.define({
+  command: 'lint:tasks',
+  description: 'lints gulp tasks',
+  task: require('./tasks/lint/tasks')
+})
+
+summary.define({
+  command: 'lint:watch',
+  description: 'watches all files and lints them on change',
+  task: require('./tasks/lint/watch')
+})
+
+module.exports = summary

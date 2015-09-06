@@ -1,8 +1,5 @@
-'use strict'
-
-var Alchemist = require('../')
-var Color = require('../lib/color')
-var expect = require('chai').expect
+import Alchemist from '../../alchemist'
+import Color from '../../lib/color'
 
 /**===========
  * Alchemist *

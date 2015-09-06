@@ -1,7 +1,4 @@
-'use strict'
-
-var helpers = require('../lib/helpers')
-var expect = require('chai').expect
+import * as helpers from '../../lib/helpers'
 
 describe('helpers', function () {
   describe('.round(value, [precision])', function () {

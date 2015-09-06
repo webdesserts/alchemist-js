@@ -1,7 +1,4 @@
-'use strict'
-
-var ConversionStore = require('../lib/conversionStore')
-var expect = require('chai').expect
+import ConversionStore from '../../lib/conversionStore'
 
 describe('ConversionStore', function () {
   var conversions, rgb, xyz, hsl;

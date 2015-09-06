@@ -1,7 +1,4 @@
-'use strict'
-
-var Color = require('../lib/color')
-var expect = require('chai').expect
+import Color from '../../lib/color'
 
 describe('Color', function () {
   var converter, space_converter, color;
