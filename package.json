@@ -9,6 +9,7 @@
   "main:src": "alchemist.js",
   "scripts": {
     "test": "gulp test",
+    "test:browser": "gulp test:browser",
     "dev": "gulp dev",
     "build": "gulp build",
     "build:browser": "gulp build:browser"

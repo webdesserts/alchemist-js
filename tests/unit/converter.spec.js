@@ -134,9 +134,26 @@ describe('Converter', function () {
   describe('.mapConversionPath(current_name, target_name)', function () {
     it('adds "next step" strings on all applicable color spaces', function () {
       converter.mapConversionPath('lchuv', 'hsl')
+
       expect(converter.spaces.find('lchuv').conversions.find('hsl')).to.eq('luv')
+      expect(converter.spaces.find('lchuv').conversions.find('luv')).to.be.a('function')
+
       expect(converter.spaces.find('luv').conversions.find('hsl')).to.eq('xyz')
+      expect(converter.spaces.find('luv').conversions.find('xyz')).to.be.a('function')
+
       expect(converter.spaces.find('xyz').conversions.find('hsl')).to.eq('rgb')
+      expect(converter.spaces.find('xyz').conversions.find('rgb')).to.be.a('function')
+
+      converter.mapConversionPath('hsl', 'lchuv')
+
+      expect(converter.spaces.find('hsl').conversions.find('lchuv')).to.eq('rgb')
+      expect(converter.spaces.find('hsl').conversions.find('rgb')).to.be.a('function')
+
+      expect(converter.spaces.find('rgb').conversions.find('lchuv')).to.eq('xyz')
+      expect(converter.spaces.find('rgb').conversions.find('xyz')).to.be.a('function')
+
+      expect(converter.spaces.find('xyz').conversions.find('lchuv')).to.eq('luv')
+      expect(converter.spaces.find('xyz').conversions.find('luv')).to.be.a('function')
     })
     it('returns the next step', function () {
       var next_step = converter.mapConversionPath('lchuv', 'hsl')

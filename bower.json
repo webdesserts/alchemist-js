@@ -1,0 +1,33 @@
+{
+  "name": "alchemist-js",
+  "version": "2.0.0",
+  "homepage": "https://github.com/webdesserts/alchemist-js",
+  "authors": [
+    "Michael Mullins <michael@webdesserts.com>"
+  ],
+  "description": "An extensible color library",
+  "main": "dist/alchemist.js",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "color-spaces",
+    "colour",
+    "color"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "Contributing.md",
+    "package.json",
+    "Readme.md",
+    "gulpfile.js",
+    "tasks",
+    "doc",
+    "tests"
+  ]
+}

@@ -4,7 +4,7 @@ import { warn } from '../utils'
 export default function lint_tasks () {
   var gulp = this.gulp
 
-  return gulp.src(['gulpfile.babel.js', 'tasks/**/*.js'])
+  return gulp.src(['gulpfile.js', 'tasks/**/*.js'])
     .pipe(jscs({ configPath: '.jscsrc' }))
     .on('error', warn)
 }

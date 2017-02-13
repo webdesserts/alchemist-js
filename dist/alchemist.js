@@ -823,14 +823,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var neighbors = [];
 	  var color_space = this.find(space_name);
 
-	  if (color_space === null) return neighbors;
+	  if (color_space === null) {
+	    return neighbors;
+	  }
 
 	  var conversions = color_space.conversions;
 
 	  conversions.each(function (conversion, target_name) {
-	    var target_space = _this.find(target_name);
-	    if (target_space && target_space.is_concrete) {
-	      neighbors.push(target_name);
+	    if (typeof conversion !== 'string') {
+	      var target_space = _this.find(target_name);
+	      if (target_space && target_space.is_concrete) {
+	        neighbors.push(target_name);
+	      }
 	    }
 	  });
 
@@ -1355,6 +1359,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  var conversion = color.conversions.find(target_name);
 	  // Test to see if the current space knows how to convert to target
+
 	  if (typeof conversion === 'function') {
 	    return this.applyConversion(color, target_name);
 	    // if the conversion is a another color space
@@ -1381,7 +1386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Converter.applyConversion = function applyConversion(color, target_name) {
 	  var value, new_color;
 	  var conversion = color.conversions.find(target_name);
-	  if (typeof conversion !== 'function') throw new TypeError('expected ' + conversion + ' to be a function');
+	  if (typeof conversion !== 'function') throw new TypeError('expected ' + conversion + ' to be a function but instead was a ' + typeof conversion);
 
 	  if (color.value === null) {
 	    value = color.value;
@@ -1420,7 +1425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  while (steps_taken < 100) {
 	    conversion = this.spaces.find(space).conversions.find(target_name);
 
-	    if (!conversion || typeof conversion !== 'function') {
+	    if (!conversion) {
 	      this.spaces.find(space).conversions.add(target_name, next_space);
 	    }
 
@@ -1468,6 +1473,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }
+
 	  return null;
 	};
 
