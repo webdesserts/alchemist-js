@@ -1,4 +1,4 @@
-![alchemist logo](https://www.dropbox.com/s/pwa86wj888a0ipv/alchemist.svg?dl=1)
+![alchemist logo](https://public-webdesserts.hashbase.io/projects/alchemist/alchemist.svg)
 
 Alchemist.js
 ============
